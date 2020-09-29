@@ -197,7 +197,7 @@ class BootstrapManager
 
             $class = str_replace('/', '\\', str_replace(ROOT_PATH, '', $directory)) . ($isTheme ? '\Template' : '\Bootstrap');
 
-            $class = 'Oforge$class';
+            $class = 'Oforge'.$class;
 
             if ($isModule || $isPlugin) {
                 $namespace = StringHelper::rightTrim($class, '\\Bootstrap');

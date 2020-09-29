@@ -15,7 +15,8 @@ use Slim\Http\Response;
  *
  * @package Oforge\Engine\Modules\TemplateEngine\Core\Manager
  */
-class DefaultViewManager extends AbstractViewManager {
+class DefaultViewManager extends AbstractViewManager
+{
     /** @var DefaultViewManager $instance */
     protected static $instance;
     /** @var array $data */
@@ -26,7 +27,8 @@ class DefaultViewManager extends AbstractViewManager {
      *
      * @return DefaultViewManager
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!isset(self::$instance)) {
             self::$instance = new DefaultViewManager();
         }
@@ -41,8 +43,9 @@ class DefaultViewManager extends AbstractViewManager {
      *
      * @return DefaultViewManager
      */
-    public function assign(array $data) {
-        $data           = ArrayHelper::dotToNested($data);
+    public function assign(array $data)
+    {
+        $data = ArrayHelper::dotToNested($data);
         $this->data = ArrayHelper::mergeRecursive($this->data, $data);
 
         return $this;
@@ -54,7 +57,8 @@ class DefaultViewManager extends AbstractViewManager {
      *
      * @return array
      */
-    public function fetch() {
+    public function fetch()
+    {
         return $this->data;
     }
 
@@ -66,7 +70,8 @@ class DefaultViewManager extends AbstractViewManager {
      *
      * @return mixed|null
      */
-    public function get(string $key, $default = null) {
+    public function get(string $key, $default = null)
+    {
         return ArrayHelper::dotGet($this->data, $key, $default);
     }
 
@@ -77,7 +82,8 @@ class DefaultViewManager extends AbstractViewManager {
      *
      * @return bool
      */
-    public function has(string $key) : bool {
+    public function has(string $key): bool
+    {
         return isset($this->data[$key]) && !empty($this->data[$key]);
     }
 
@@ -85,7 +91,8 @@ class DefaultViewManager extends AbstractViewManager {
      * @param string $key
      * @return DefaultViewManager
      */
-    public function delete(string $key) {
+    public function delete(string $key)
+    {
         unset($this->data[$key]);
         return $this;
     }
