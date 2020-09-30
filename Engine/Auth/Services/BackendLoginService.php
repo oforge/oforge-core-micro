@@ -8,7 +8,7 @@
 
 namespace Oforge\Engine\Auth\Services;
 
-use Oforge\Engine\Auth\Models\User\BackendUser;
+use Oforge\Engine\Auth\Models\User\User;
 
 /**
  * Class BackendLoginService
@@ -21,7 +21,7 @@ class BackendLoginService extends BaseLoginService {
      * BackendLoginService constructor.
      */
     public function __construct() {
-        parent::__construct(BackendUser::class);
+        parent::__construct(User::class);
     }
 
 }

@@ -9,7 +9,7 @@
 namespace Oforge\Engine\Auth\Services;
 
 use Doctrine\ORM\ORMException;
-use Oforge\Engine\Auth\Models\User\BaseUser;
+use Oforge\Engine\Auth\Models\User\User;
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 
@@ -39,14 +39,13 @@ class BaseLoginService extends AbstractDatabaseAccess {
      *
      * @return string|null
      * @throws ServiceNotFoundException
-     * @throws ORMException
      */
     public function login(string $email, string $password) {
         /** @var AuthService $authService */
         $authService = Oforge()->Services()->get('auth');
         /** @var PasswordService $passwordService */
         $passwordService = Oforge()->Services()->get('password');
-        /** @var BaseUser|null $user */
+        /** @var User|null $user */
         $user = $this->repository()->findOneBy([
             'email'  => $email,
             'active' => true,

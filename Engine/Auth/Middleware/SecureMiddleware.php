@@ -3,7 +3,7 @@
 namespace Oforge\Engine\Auth\Middleware;
 
 use Oforge\Engine\Auth\Controller\SecureController;
-use Oforge\Engine\Auth\Models\User\BaseUser;
+use Oforge\Engine\Auth\Models\User\User;
 use Oforge\Engine\Auth\Services\AuthService;
 use Oforge\Engine\Auth\Services\PermissionService;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
@@ -18,7 +18,7 @@ use Slim\Http\Response;
  */
 class SecureMiddleware {
     /** @var string $userClass */
-    protected $userClass = BaseUser::class;
+    protected $userClass = User::class;
     /** @var string $viewUserDataKey */
     protected $viewUserDataKey = 'user';
     /** @var string $invalidRedirectPathName The named path for redirects */

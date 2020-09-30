@@ -1,5 +1,4 @@
 <?php
-
 namespace Oforge\Engine\Auth\Models\User;
 
 use DateTimeImmutable;
@@ -7,10 +6,21 @@ use Doctrine\ORM\Mapping as ORM;
 use Oforge\Engine\Core\Abstracts\AbstractModel;
 
 /**
- * @ORM\MappedSuperclass()
+ * @ORM\Entity
+ * @ORM\Table(name="oforge_auth_user")
  * @ORM\HasLifecycleCallbacks
  */
-class BaseUser extends AbstractModel {
+class User extends AbstractModel {
+
+    /**
+     * Roles
+     */
+    public const ROLE_SYSTEM        = 0;
+    public const ROLE_ADMINISTRATOR = 1;
+    public const ROLE_MODERATOR     = 2;
+    public const ROLE_LOGGED_IN     = 999;
+    public const ROLE_PUBLIC        = 1000;
+
     /**
      * @var int $id
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -24,8 +34,10 @@ class BaseUser extends AbstractModel {
      */
     private $email;
     /**
-     * @var string $password
-     * @ORM\Column(name="password", type="string", nullable=false)
+     * @var int $id
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $password;
     /**
@@ -43,6 +55,12 @@ class BaseUser extends AbstractModel {
      * @ORM\Column(name="active", type="boolean", nullable=false, options={"default":false})
      */
     private $active = false;
+
+    /**
+     * @var int
+     * @ORM\Column (name="role_id")
+     */
+    private $role;
 
     public function __construct() {
         $dateTimeNow     = new DateTimeImmutable('now');
@@ -72,9 +90,9 @@ class BaseUser extends AbstractModel {
     /**
      * @param int $id
      *
-     * @return BaseUser
+     * @return User
      */
-    public function setId(int $id) : BaseUser {
+    public function setId(int $id) : User {
         $this->id = $id;
 
         return $this;
@@ -90,9 +108,9 @@ class BaseUser extends AbstractModel {
     /**
      * @param string $email
      *
-     * @return BaseUser
+     * @return User
      */
-    public function setEmail(string $email) : BaseUser {
+    public function setEmail(string $email) : User {
         $this->email = $email;
 
         return $this;
@@ -108,9 +126,9 @@ class BaseUser extends AbstractModel {
     /**
      * @param string $password
      *
-     * @return BaseUser
+     * @return User
      */
-    public function setPassword(string $password) : BaseUser {
+    public function setPassword(string $password) : User {
         $this->password = $password;
 
         return $this;
@@ -140,12 +158,29 @@ class BaseUser extends AbstractModel {
     /**
      * @param bool $active
      *
-     * @return BaseUser
+     * @return User
      */
-    public function setActive(bool $active) : BaseUser {
+    public function setActive(bool $active) : User {
         $this->active = $active;
 
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getRole(): int
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param int $role
+     * @return User
+     */
+    public function setRole(int $role): User
+    {
+        $this->role = $role;
+        return $this;
+    }
 }

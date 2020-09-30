@@ -2,7 +2,7 @@
 
 namespace Oforge\Engine\Auth\Controller;
 
-use Oforge\Engine\Auth\Models\User\BaseUser;
+use Oforge\Engine\Auth\Models\User\User;
 use Oforge\Engine\Auth\Services\PermissionService;
 use Oforge\Engine\Core\Abstracts\AbstractController;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
@@ -14,7 +14,7 @@ use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
  */
 class SecureController extends AbstractController {
     /** @var string $secureControllerUserClass */
-    protected $secureControllerUserClass = BaseUser::class;
+    protected $secureControllerUserClass = User::class;
 
     public function initPermissions() {
     }
