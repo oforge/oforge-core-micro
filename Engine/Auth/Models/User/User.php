@@ -34,10 +34,8 @@ class User extends AbstractModel {
      */
     private $email;
     /**
-     * @var int $id
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @var string $password
+     * @ORM\Column(name="password", type="string", nullable=false)
      */
     private $password;
     /**

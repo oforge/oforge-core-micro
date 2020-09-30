@@ -2,11 +2,12 @@
 
 namespace Oforge\Engine\Auth;
 
-use Oforge\Engine\Auth\Models\User\BackendUser;
+use Oforge\Engine\Auth\Models\User\User;
 use Oforge\Engine\Auth\Services\AuthService;
 use Oforge\Engine\Auth\Services\BackendLoginService;
 use Oforge\Engine\Auth\Services\PasswordService;
 use Oforge\Engine\Auth\Services\PermissionService;
+use Oforge\Engine\Auth\Services\UserService;
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Core\Models\Config\ConfigType;
 use Oforge\Engine\Core\Services\ConfigService;
@@ -23,7 +24,7 @@ class Bootstrap extends AbstractBootstrap {
      */
     public function __construct() {
         $this->models = [
-            BackendUser::class,
+            User::class,
         ];
 
         $this->services = [
@@ -31,6 +32,7 @@ class Bootstrap extends AbstractBootstrap {
             'backend.login' => BackendLoginService::class,
             'password'      => PasswordService::class,
             'permissions'   => PermissionService::class,
+            'user'          => UserService::class
         ];
     }
 

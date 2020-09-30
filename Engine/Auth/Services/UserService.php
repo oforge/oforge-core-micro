@@ -26,14 +26,13 @@ class UserService extends AbstractDatabaseAccess {
      * Create backend user.
      *
      * @param string $email
-     * @param string $name
      * @param string|null $password
      * @param int $role
      *
      * @return string
      * @throws Exception
      */
-    public function createUser(string $email, string $name, ?string $password = null, int $role = User::ROLE_ADMINISTRATOR) {
+    public function createUser(string $email, ?string $password = null, int $role = User::ROLE_ADMINISTRATOR) {
         if ($this->repository('User')->count(['email' => $email]) > 0) {
             return "User  with email '$email' already exists.";
         }
@@ -57,7 +56,6 @@ class UserService extends AbstractDatabaseAccess {
 
         $User = User::create([
             'email'    => $email,
-            'name'     => $name,
             'role'     => $role,
             'password' => $passwordHash,
             'active'   => true,
