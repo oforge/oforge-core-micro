@@ -19,7 +19,7 @@ class EndpointClass {
      */
     private $path;
     /**
-     * Global asset scope for this class. Overridable by Endpoint#assetScope. Default=Frontend.
+     * Global asset bundles for this class. Overridable by Endpoint#assetBundles. Default=NULL(none).
      *
      * @var string|string[]|null $assetBundles
      */
@@ -57,7 +57,7 @@ class EndpointClass {
      * @throws AnnotationException
      */
     public function __construct(array $config) {
-        $this->assetBundles     = $config['assetScope'] ?? $config['assetBundles'] ?? null;//TODO remove assetScore after asset refactoring
+        $this->assetBundles     = $config['assetBundles'] ?? null;
         $this->assetBundlesMode = $config['assetBundlesMode'] ?? null;
 
         $this->name  = $config['name'] ?? '';

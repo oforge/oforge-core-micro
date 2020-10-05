@@ -31,7 +31,7 @@ class EndpointAction {
      */
     private $method;
     /**
-     * Optional asset scope for this action, overrides EndpointClass#assetScope.
+     * Optional asset bundles for this action, overrides EndpointClass#assetBundles.
      *
      * @var string|string[]|null $assetBundles
      */
@@ -59,20 +59,20 @@ class EndpointAction {
      * @param array $config
      */
     public function __construct(array $config) {
-        $this->assetBundles     = $config['assetScope'] ?? $config['assetBundles'] ?? null;//TODO remove assetScore after asset refactoring
+        $this->assetBundles     = $config['assetBundles'] ?? null;
         $this->assetBundlesMode = $config['assetBundlesMode'] ?? null;
 
         $this->method = $config['method'] ?? EndpointMethod::ANY;
         $this->name   = $config['name'] ?? '';
         $this->order  = $config['order'] ?? null;
-        $this->path   = $config['path'] ?? '';
+        $this->path   = $config['path'] ?? null;
         $this->create = $config['create'] ?? true;
     }
 
     /**
      * @return string
      */
-    public function getPath() : string {
+    public function getPath() : ?string {
         return $this->path;
     }
 

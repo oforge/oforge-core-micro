@@ -85,7 +85,7 @@ class EndpointService extends AbstractDatabaseAccess {
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function activate(array $endpoints) {//TODO ungetestet
+    public function activate(array $endpoints) {
         $this->iterateEndpointModels($endpoints, function (EndpointModel $endpoint) {
             $endpoint->setActive(true);
         });
@@ -100,7 +100,7 @@ class EndpointService extends AbstractDatabaseAccess {
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function deactivate(array $endpoints) {//TODO ungetestet
+    public function deactivate(array $endpoints) {
         $this->iterateEndpointModels($endpoints, function (EndpointModel $endpoint) {
             $endpoint->setActive(false);
         });
@@ -115,7 +115,7 @@ class EndpointService extends AbstractDatabaseAccess {
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function deinstall(array $endpoints) {//TODO ungetestet
+    public function deinstall(array $endpoints) {
         $this->iterateEndpointModels($endpoints, function (EndpointModel $endpoint) {
             $this->entityManager()->remove($endpoint, false);
 
@@ -309,7 +309,7 @@ class EndpointService extends AbstractDatabaseAccess {
                 $httpMethod = $methodAnnotation->getMethod();
             }
         }
-        if (isset($methodAnnotation) && !empty($methodAnnotation->getPath())) {
+        if (isset($methodAnnotation) && $methodAnnotation->getPath() !== null) {
             $path .= $methodAnnotation->getPath();
         } elseif (!$isIndexAction) {
             $path .= '/' . $actionName;
@@ -325,47 +325,7 @@ class EndpointService extends AbstractDatabaseAccess {
         $order = $order ?? $classAnnotation->getOrder() ?? Statics::DEFAULT_ORDER;
 
         $assetBundlesMode = $assetBundlesMode ?? AssetBundlesMode::OVERRIDE;
-        $assetBundles     = (function () use ($assetBundlesMode, $classAssetBundles, $methodAssetBundles) {
-            /**
-             * @param string|string[]|null $values
-             *
-             * @return string[]
-             */
-            $convert = function ($values) {
-                if ($values === null) {
-                    return [];
-                }
-                if (is_string($values)) {
-                    $values = explode(',', $values);
-                }
-                foreach ($values as $index => $assetBundle) {
-                    $values[$index] = ucfirst(trim($assetBundle));
-                }
-
-                return $values;
-            };
-            switch ($assetBundlesMode) {
-                case AssetBundlesMode::MERGE:
-                    return array_unique(array_merge($convert($classAssetBundles), $convert($methodAssetBundles)));
-                case AssetBundlesMode::NONE:
-                    return [];
-                case AssetBundlesMode::OVERRIDE:
-                default:
-                    $assetBundles = $convert($methodAssetBundles);
-                    if (empty($assetBundles)) {
-                        $assetBundles = $convert($classAssetBundles);
-                    }
-
-                    return $assetBundles;
-            }
-        })();
-
-        if (is_string($assetBundles)) {
-            $assetBundles = explode(',', $assetBundles);
-        }
-        foreach ($assetBundles as $index => $assetBundle) {
-            $assetBundles[$index] = ucfirst(trim($assetBundle));
-        }
+        $assetBundles     = $this->prepareEndpointAssetBundles($assetBundlesMode, $classAssetBundles, $methodAssetBundles);
 
         return [
             'name'             => $name,
@@ -380,4 +340,53 @@ class EndpointService extends AbstractDatabaseAccess {
             // 'controllerAction' => $actionName ?? '-',
         ];
     }
+
+    /**
+     * @param string $assetBundlesMode
+     * @param string|string[]|null $classAssetBundles
+     * @param string|string[]|null $methodAssetBundles
+     *
+     * @return string[]
+     */
+    private function prepareEndpointAssetBundles(string $assetBundlesMode, $classAssetBundles, $methodAssetBundles) {
+        /**
+         * @param string|string[]|null $values
+         *
+         * @return string[]
+         */
+        $convert = function ($values) {
+            if ($values === null) {
+                return [];
+            }
+            if (is_string($values)) {
+                $values = explode(',', $values);
+            }
+
+            return $values;
+        };
+
+        switch ($assetBundlesMode) {
+            case AssetBundlesMode::MERGE:
+                $assetBundles = array_unique(array_merge($convert($classAssetBundles), $convert($methodAssetBundles)));
+                break;
+            case AssetBundlesMode::NONE:
+                $assetBundles = [];
+                break;
+            case AssetBundlesMode::OVERRIDE:
+            default:
+                $assetBundles = $convert($methodAssetBundles);
+                if (empty($assetBundles)) {
+                    $assetBundles = $convert($classAssetBundles);
+                }
+        }
+        if (is_string($assetBundles)) {
+            $assetBundles = explode(',', $assetBundles);
+        }
+        foreach ($assetBundles as $index => $assetBundle) {
+            $assetBundles[$index] = ucfirst(trim($assetBundle));
+        }
+
+        return $assetBundles;
+    }
+
 }
