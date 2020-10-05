@@ -89,11 +89,13 @@ class DefaultViewManager extends AbstractViewManager {
         return $this;
     }
 
-    public function render(Request $request, Response $response, array $data) {
+    /** @inheritdoc  */
+    public function render(Request $request, Response $response, array $data) : Response{
         if ($response->getStatusCode() !== 200 || !empty($response->getBody()->getSize())) {
             return $response;
         }
 
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json')->withJson($data);
     }
+
 }
