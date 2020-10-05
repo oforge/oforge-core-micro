@@ -1,10 +1,11 @@
 <?php
 
-namespace Oforge\Engine\Core\Controller\Frontend;
+namespace Oforge\Engine\Core\Controller\Api;
 
 use Oforge\Engine\Core\Abstracts\AbstractController;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointClass;
+use Oforge\Engine\Core\Helper\ResponseHelper;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -24,8 +25,7 @@ class PingController extends AbstractController {
      * @EndpointAction()
      */
     public function indexAction(Request $request, Response $response) {
-
-        return $this->json($request, $response, ['message' => 'Ping']);
+        return ResponseHelper::json($response, ['message' => 'Ping']);
     }
 
 }

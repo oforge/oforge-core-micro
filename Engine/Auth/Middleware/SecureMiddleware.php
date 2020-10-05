@@ -7,7 +7,7 @@ use Oforge\Engine\Auth\Models\User\User;
 use Oforge\Engine\Auth\Services\AuthService;
 use Oforge\Engine\Auth\Services\PermissionService;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
-use Oforge\Engine\Core\Helper\RouteHelper;
+use Oforge\Engine\Core\Helper\ResponseHelper;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -80,10 +80,10 @@ class SecureMiddleware {
             }
             $_SESSION['login_redirect_url'] = $referrer;
             if (!empty($this->invalidRedirectPathName)) {
-                return RouteHelper::redirect($response, $this->invalidRedirectPathName);
+                return ResponseHelper::redirect($response, $this->invalidRedirectPathName);
             }
 
-            return $response->withRedirect('/', 302);
+            return ResponseHelper::redirectToUri($response, '/');
         }
 
         return $response;
