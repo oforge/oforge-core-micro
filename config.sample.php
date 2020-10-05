@@ -19,13 +19,10 @@ return [
     'db'                => [
         // if true, metadata caching is forcefully disabled
         'dev_mode'      => true,
-
         // path where the compiled metadata info will be cached. make sure the path exists and it is writable
         'cache_dir'     => ROOT_PATH . '/' . Statics::DB_CACHE_DIR,
-
         // you should add any other path containing annotated entity classes
         'metadata_dirs' => [ROOT_PATH . '/Engine', ROOT_PATH . '/Plugins'],
-
         'connection' => [
             'driver'   => 'pdo_mysql',
             'host'     => 'localhost',
@@ -42,10 +39,8 @@ return [
         // 'method' => 'aes-128-gcm', // Default: aes-128-gcm
         'key' => 'my awesome salt',
     ],
-
     // host_url needed in specific cases (i.e. cronjobs generating domain specific links)
     'host_url'          => '', // your domain
-
     // Configuration for detailed error reporting (in case of server error) via mail (over smtp)
     'error_mail_report' => [
         'active'          => false,  // enable/disable error reporting
@@ -60,9 +55,6 @@ return [
         ],
     ],
     // plugin configs
-    'Plugins' => [
-        'ReportErrorForm' => [
-            // '<address>' =>  '<name="">',
-        ],
+    'plugins' => [
     ],
 ];

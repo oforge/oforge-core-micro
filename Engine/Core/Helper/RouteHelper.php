@@ -2,9 +2,6 @@
 
 namespace Oforge\Engine\Core\Helper;
 
-use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
-use Oforge\Engine\TemplateEngine\Extensions\Services\UrlService;
-use Slim\Http\Response;
 use Slim\Router;
 
 /**
@@ -20,28 +17,8 @@ class RouteHelper {
     /** @var string $basePath */
     private static $basePath;
 
-    /**
-     * Prevent instance.
-     */
+    /** Prevent instance. */
     private function __construct() {
-    }
-
-    /**
-     * @param Response $response
-     * @param string|null $routeName If null, the routeName by meta.route.name.
-     * @param array $namedParams
-     * @param array $queryParams
-     *
-     * @return Response
-     */
-    public static function redirect(Response $response, ?string $routeName = null, array $namedParams = [], array $queryParams = []) : Response {
-        self::init();
-        if ($routeName === null) {
-            $routeName = Oforge()->View()->get('meta.route.name');
-        }
-        $uri = self::getSlimUrl($routeName, $namedParams, $queryParams);
-
-        return $response->withRedirect($uri, 302);
     }
 
     /**
@@ -84,23 +61,6 @@ class RouteHelper {
     }
 
     /**
-     * Get url for route, possible modified by services.
-     *
-     * @param string $routeName
-     * @param array $namedParams
-     * @param array $queryParams
-     *
-     * @return mixed|string
-     * @throws ServiceNotFoundException
-     */
-    public static function getUrl(string $routeName, array $namedParams = [], array $queryParams = []) {
-        /** @var UrlService $urlService */
-        $urlService = Oforge()->Services()->get('url');
-
-        return $urlService->getUrl($routeName, $namedParams, $queryParams);
-    }
-
-    /**
      * Get slim registered url for route.
      *
      * @param string $routeName
@@ -132,7 +92,9 @@ class RouteHelper {
 
     private static function init() {
         if (!isset(self::$router)) {
+            /** @noinspection MissingService */
             self::$router = Oforge()->App()->getContainer()->get('router');
         }
     }
+
 }
