@@ -2,14 +2,14 @@
 
 namespace Oforge\Engine\Core\Exceptions;
 
-use Exception;
+use Oforge\Engine\Core\Exceptions\Basic\AlreadyExistException;
 
 /**
  * Class ServiceAlreadyDefinedException
  *
  * @package Oforge\Engine\Core\Exceptions
  */
-class ServiceAlreadyExistException extends Exception {
+class ServiceAlreadyExistException extends AlreadyExistException {
 
     /**
      * ServiceNotFoundException constructor.
@@ -17,7 +17,7 @@ class ServiceAlreadyExistException extends Exception {
      * @param string $serviceName
      */
     public function __construct(string $serviceName) {
-        parent::__construct("A service with name '$serviceName' is already exist!");
+        parent::__construct("Service with name '$serviceName' already exist!");
     }
 
 }
