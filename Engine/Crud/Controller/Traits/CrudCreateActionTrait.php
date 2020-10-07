@@ -33,7 +33,9 @@ trait CrudCreateActionTrait {
         } else {
             try {
                 $data = ArrayHelper::mergeRecursive($this->prepareCreateDefaultData(), $data, true);
-                $this->handleFileUploads($data, $request, 'create');
+                if (method_exists($this, 'handleFileUploads')) {
+                    $this->handleFileUploads($data, $request, 'create');
+                }
                 $data   = $this->convertData($data, 'create');
                 $entity = $this->crudService->create($this->model, $data);
 

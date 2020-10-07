@@ -30,7 +30,9 @@ trait CrudUpdateActionTrait {
             return $response->withStatus(400);
         } else {
             try {
-                $this->handleFileUploads($data, $request, 'update');
+                if (method_exists($this, 'handleFileUploads')) {
+                    $this->handleFileUploads($data, $request, 'update');
+                }
                 $data   = $this->convertData($data, 'update');
                 $entity = $this->crudService->update($this->model, $args['id'], $data);
 
