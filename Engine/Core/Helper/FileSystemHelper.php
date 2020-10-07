@@ -28,6 +28,24 @@ class FileSystemHelper {
     }
 
     /**
+     * Generate temp folder path and optional create it.
+     *
+     * @param bool $mkdir
+     *
+     * @return string
+     */
+    public static function createTempFolder(bool $mkdir) : string {
+        do {
+            $tmpFolder = Statics::TMP_DIR_ABSOLUTE . Statics::GLOBAL_SEPARATOR . md5(rand());
+        } while (file_exists($tmpFolder));
+        if ($mkdir) {
+            FileSystemHelper::mkdir($tmpFolder);
+        }
+
+        return $tmpFolder;
+    }
+
+    /**
      * Delete single file or directory.
      * Directories can optionally be recursively deleted and empty directories will not be deleted.
      *

@@ -36,6 +36,8 @@ class Statics {
     public const DB_CACHE_FILE      = Statics::DB_CACHE_DIR . Statics::GLOBAL_SEPARATOR . "db.cache";
     public const IMPORTS_DIR        = Statics::GLOBAL_SEPARATOR . Statics::VAR_DIR . Statics::GLOBAL_SEPARATOR . "imports";
     public const DEFAULT_THEME      = "Base";
+    public const TMP_DIR            = self::GLOBAL_SEPARATOR . self::VAR_DIR . self::GLOBAL_SEPARATOR . 'tmp';
+    public const TMP_DIR_ABSOLUTE   = ROOT_PATH . self::TMP_DIR;
     //public const MAIL_TEMP_CACHE_DIR  = Statics::CACHE_DIR . Statics::GLOBAL_SEPARATOR . 'mail';
     /**
      * Relative path of logs folder.

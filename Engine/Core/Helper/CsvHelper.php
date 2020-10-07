@@ -2,6 +2,7 @@
 
 namespace Oforge\Engine\Core\Helper;
 
+use Exception;
 use LimitIterator;
 use SplFileObject;
 
@@ -20,9 +21,7 @@ class CsvHelper {
         'header-row'          => true,
     ];
 
-    /**
-     * Prevent instance.
-     */
+    /** Prevent instance. */
     private function __construct() {
     }
 
@@ -33,21 +32,21 @@ class CsvHelper {
      * @param callable $rowCallable
      * @param array $options
      *
-     * @throws \Exception If the file is not readable.
+     * @throws Exception If the file is not readable.
      */
     public static function read(string $filepath, callable $rowCallable, array $options = []) {
         if (!file_exists($filepath)) {
-            throw new \Exception("File '$filepath' does not exist.");
+            throw new Exception("File '$filepath' does not exist.");
         }
         if (!is_readable($filepath)) {
-            throw new \Exception("File '$filepath' is not readable.1");
+            throw new Exception("File '$filepath' is not readable.1");
         }
         $filepath = realpath($filepath);
         if (!file_exists($filepath)) {
-            throw new \Exception("File '$filepath' does not exist.");
+            throw new Exception("File '$filepath' does not exist.");
         }
         if (!is_readable($filepath)) {
-            throw new \Exception("File '$filepath' is not readable.2");
+            throw new Exception("File '$filepath' is not readable.2");
         }
         $options   = array_merge(self::DEFAULT_CONFIG, $options);
         $startLine = $options['header-row'] ? 1 : 0;
@@ -64,7 +63,9 @@ class CsvHelper {
         $splFileObject->setFlags($flags);
         $splFileObjectIterator = new LimitIterator($splFileObject, $startLine);
         foreach ($splFileObjectIterator as $csvRow) {
-            $rowCallable($csvRow);
+            if (is_array($csvRow)) {
+                $rowCallable($csvRow);
+            }
         }
     }
 
@@ -76,11 +77,11 @@ class CsvHelper {
      * @param array|null $header
      * @param array $options
      *
-     * @throws \Exception If file already exist.
+     * @throws Exception If file already exist.
      */
     public static function write(string $filepath, array $rows, ?array $header = null, array $options = []) {
         if (file_exists($filepath)) {
-            throw new \Exception("File '$filepath' already exist.");
+            throw new Exception("File '$filepath' already exist.");
         }
         $options   = array_merge(self::DEFAULT_CONFIG, $options);
         $delimiter = $options['delimiter'];
