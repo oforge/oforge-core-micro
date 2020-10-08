@@ -30,19 +30,21 @@ class FileSystemHelper {
     /**
      * Generate temp folder path and optional create it.
      *
-     * @param bool $mkdir
+     * @param bool $mkdir mkdir folder?
+     * @param bool $returnAbsolutePath Return absolute path or relative path (to oforge root).
      *
      * @return string
      */
-    public static function createTempFolder(bool $mkdir) : string {
+    public static function getTempFolder(bool $mkdir, bool $returnAbsolutePath = true) : string {
         do {
-            $tmpFolder = Statics::TMP_DIR_ABSOLUTE . Statics::GLOBAL_SEPARATOR . md5(rand());
-        } while (file_exists($tmpFolder));
+            $tmpFolderRelative = Statics::DIR_TMP . Statics::GLOBAL_SEPARATOR . md5(rand());
+            $tmpFolderAbsolute = ROOT_PATH . $tmpFolderRelative;
+        } while (file_exists($tmpFolderAbsolute));
         if ($mkdir) {
-            FileSystemHelper::mkdir($tmpFolder);
+            FileSystemHelper::mkdir($tmpFolderAbsolute);
         }
 
-        return $tmpFolder;
+        return $returnAbsolutePath ? $tmpFolderAbsolute : $tmpFolderRelative;
     }
 
     /**
@@ -235,7 +237,7 @@ class FileSystemHelper {
         if (isset(self::$findCache[$context])) {
             return self::$findCache[$context];
         }
-        $cacheFile = ROOT_PATH . Statics::CACHE_DIR . Statics::GLOBAL_SEPARATOR . $context . '.cache.php';
+        $cacheFile = ROOT_PATH . Statics::DIR_CACHE . Statics::GLOBAL_SEPARATOR . $context . '.cache.php';
 
         if (file_exists($cacheFile) && Oforge()->Settings()->isProductionMode()) {
             $result = ArrayPhpFileStorage::load($cacheFile);

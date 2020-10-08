@@ -12,6 +12,7 @@ use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Core\Annotation\Endpoint\AssetBundlesMode;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointClass;
+use Oforge\Engine\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Core\Helper\Statics;
 use Oforge\Engine\Core\Helper\StringHelper;
 use Oforge\Engine\Core\Models\Endpoint\Endpoint as EndpointModel;
@@ -160,8 +161,9 @@ class EndpointService extends AbstractDatabaseAccess {
         $endpointConfigs  = [];
         class_exists(EndpointClass::class);
         class_exists(EndpointAction::class);
-        if (!file_exists(Statics::ENDPOINT_CACHE_DIR)) {
-            @mkdir(Statics::ENDPOINT_CACHE_DIR, 0755, true);
+
+        if (!file_exists(ROOT_PATH . Statics::DIR_CACHE_ENDPOINT)) {
+            FileSystemHelper::mkdir(ROOT_PATH . Statics::DIR_CACHE_ENDPOINT);
         }
 
         $reader = new IndexedReader(new AnnotationReader());
@@ -180,7 +182,7 @@ class EndpointService extends AbstractDatabaseAccess {
             }
             $fileName = ltrim(str_replace('\\', '_', $fileName), '_');
             if ($isProductionMode) {
-                $cacheFile = Statics::ENDPOINT_CACHE_DIR . Statics::GLOBAL_SEPARATOR . $fileName . '.cache';
+                $cacheFile = ROOT_PATH . Statics::DIR_CACHE_ENDPOINT . Statics::GLOBAL_SEPARATOR . $fileName . '.cache';
                 if (file_exists($cacheFile)) {
                     if (!isset($this->configCache[$fileName])) {
                         $content                      = trim(file_get_contents($cacheFile));

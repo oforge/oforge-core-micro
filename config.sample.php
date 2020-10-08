@@ -20,7 +20,7 @@ return [
         // if true, metadata caching is forcefully disabled
         'dev_mode'      => true,
         // path where the compiled metadata info will be cached. make sure the path exists and it is writable
-        'cache_dir'     => ROOT_PATH . '/' . Statics::DB_CACHE_DIR,
+        'cache_dir'     => ROOT_PATH . Statics::DIR_CACHE_DB,
         // you should add any other path containing annotated entity classes
         'metadata_dirs' => [ROOT_PATH . '/Engine', ROOT_PATH . '/Plugins'],
         'connection' => [

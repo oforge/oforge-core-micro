@@ -2,6 +2,7 @@
 
 namespace Oforge\Engine\Core\Manager\Logger;
 
+use DirectoryIterator;
 use Exception;
 use InvalidArgumentException;
 use Monolog\Handler\RotatingFileHandler;
@@ -60,11 +61,11 @@ class LoggerManager {
      * @param int $days
      */
     public function cleanupLogFiles($days = self::DEFAULT_DAYS_LIMIT) {//TODO noch ungetestet
-        $logDir = ROOT_PATH . Statics::LOGS_DIR;
+        $logDir = ROOT_PATH . Statics::DIR_LOG;
         if (file_exists($logDir)) {
             $now           = time();
             $daysInSeconds = $days * 24 * 60 * 60;
-            foreach (new \DirectoryIterator($logDir) as $fileInfo) {
+            foreach (new DirectoryIterator($logDir) as $fileInfo) {
                 if ($fileInfo->isDot()) {
                     continue;
                 }
@@ -110,13 +111,13 @@ class LoggerManager {
         $type   = ArrayHelper::get($config, 'type', 'default');
         switch ($type) {
             case 'StreamHandler':
-                $path    = ArrayHelper::get($config, 'path', ROOT_PATH . Statics::LOGS_DIR . Statics::GLOBAL_SEPARATOR . $name . self::FILE_EXTENSION);
+                $path    = ArrayHelper::get($config, 'path', ROOT_PATH . Statics::DIR_LOG . Statics::GLOBAL_SEPARATOR . $name . self::FILE_EXTENSION);
                 $handler = new StreamHandler($path, $level);
                 $logger->pushHandler($handler);
                 break;
             case 'RotatingFileHandler':
             default:
-                $path     = ArrayHelper::get($config, 'path', ROOT_PATH . Statics::LOGS_DIR . Statics::GLOBAL_SEPARATOR . $name . self::FILE_EXTENSION);
+                $path     = ArrayHelper::get($config, 'path', ROOT_PATH . Statics::DIR_LOG . Statics::GLOBAL_SEPARATOR . $name . self::FILE_EXTENSION);
                 $maxFiles = ArrayHelper::get($config, 'max_files', self::DEFAULT_DAYS_LIMIT);
                 $handler  = new RotatingFileHandler($path, $maxFiles, $level);
                 $logger->pushHandler($handler);

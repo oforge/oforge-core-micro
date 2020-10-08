@@ -31,7 +31,7 @@ class CacheManager {
      * @param $slot
      */
     public function cleanUp($slot) {
-        FileSystemHelper::delete(ROOT_PATH . Statics::FUNCTION_CACHE_DIR . Statics::GLOBAL_SEPARATOR . $slot, true);
+        FileSystemHelper::delete(ROOT_PATH . Statics::DIR_CACHE_FUNCTION . Statics::GLOBAL_SEPARATOR . $slot, true);
     }
 
     /**
@@ -135,7 +135,7 @@ class CacheManager {
     private function getDirName(string $slot, string $className, string $functionName) {
         $shortName = (new \ReflectionClass($className))->getShortName();
 
-        return ROOT_PATH . Statics::FUNCTION_CACHE_DIR . Statics::GLOBAL_SEPARATOR . $slot . Statics::GLOBAL_SEPARATOR . $shortName . Statics::GLOBAL_SEPARATOR . $functionName;
+        return ROOT_PATH . Statics::DIR_CACHE_FUNCTION . Statics::GLOBAL_SEPARATOR . $slot . Statics::GLOBAL_SEPARATOR . $shortName . Statics::GLOBAL_SEPARATOR . $functionName;
 
     }
 

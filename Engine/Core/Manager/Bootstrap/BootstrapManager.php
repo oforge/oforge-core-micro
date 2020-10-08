@@ -17,7 +17,7 @@ use Oforge\Engine\TemplateEngine\Core\Abstracts\AbstractTemplate;
  */
 class BootstrapManager
 {
-    private const FILE_PATH = ROOT_PATH . Statics::CACHE_DIR . Statics::GLOBAL_SEPARATOR . 'bootstrap.php';
+    private const FILE_PATH = ROOT_PATH . Statics::DIR_CACHE . Statics::GLOBAL_SEPARATOR . 'bootstrap.php';
     public const  KEY_PATH = 'path';
     public const  KEY_NS = 'namespace';
     /** @var BootstrapManager $instance */
