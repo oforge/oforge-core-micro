@@ -2,6 +2,7 @@
 
 namespace Oforge\Engine\Core\Manager\Events;
 
+use Oforge\Engine\Core\Helper\ArrayHelper;
 use Oforge\Engine\Core\Models\Event\EventModel;
 
 /**
@@ -99,12 +100,22 @@ class Event {
     }
 
     /**
-     * @param $key
+     * @param int|string $key Allows dot based keys.
+     * @param mixed $value
+     */
+    public function setDataValue($key, $value) : Event {
+        $this->data = ArrayHelper::dotSet($this->data, $key, $value);
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $key Allows dot based keys.
      *
      * @return mixed|null
      */
-    public function getDataArrayValue($key) {
-        return $this->data[$key] ?? null;
+    public function getDataValue($key) {
+        return ArrayHelper::dotGet($this->data, $key);
     }
 
     /**
