@@ -68,8 +68,8 @@ class FileHelper {
      */
     public static function trimExtension($filePath) : string {
         $data = pathinfo($filePath);
-
-        return $data['dirname'] . Statics::GLOBAL_SEPARATOR . $data['filename'];
+        
+        return ltrim(ArrayHelper::get($data, 'dirname', '') . Statics::GLOBAL_SEPARATOR . $data['filename'], Statics::GLOBAL_SEPARATOR);
     }
 
 }
