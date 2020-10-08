@@ -103,6 +103,7 @@ class ArrayHelper {
 
     /**
      * Extract all data by key with original value.
+     *
      * @param array $inputArray
      * @param array $keys
      *
@@ -143,6 +144,18 @@ class ArrayHelper {
     }
 
     /**
+     * Check if value by key in dot notation exist.
+     *
+     * @param array $array
+     * @param string $key
+     *
+     * @return bool
+     */
+    public static function dotExist(array $array, string $key) : bool {
+        return self::dotGet($array, $key, null) === self::dotGet($array, $key, false);
+    }
+
+    /**
      * Get value by key in dot notation or $default if not exist.
      *
      * @param array $array
@@ -152,7 +165,7 @@ class ArrayHelper {
      * @return mixed
      */
     public static function dotGet(array $array, string $key, $default = null) {
-        if (empty($key) || empty($array)) {
+        if (empty($array) ||empty($key)) {
             return $default;
         }
         if (strpos($key, '.') !== false) {
@@ -178,27 +191,54 @@ class ArrayHelper {
      * @param array $array
      * @param string|string[] $keyOrKeyPath
      * @param mixed $value
+     * @param bool $overrideExistingValue Override existing value or create array if not array and append value.
      *
      * @return array
      */
-    public static function dotSet(array $array, $keyOrKeyPath, $value) {
-        if (is_string($keyOrKeyPath) && strpos($keyOrKeyPath, '.') !== false) {
+    public static function dotSet(array $array, $keyOrKeyPath, $value, bool $overrideExistingValue = true) {
+        if (is_string($keyOrKeyPath)) {
             $keyOrKeyPath = explode('.', $keyOrKeyPath);
         }
-        if (is_array($keyOrKeyPath)) {
-            $tmp  = &$array;
-            foreach ($keyOrKeyPath as $key) {
-                if (!isset($tmp[$key])) {
-                    $tmp[$key] = [];
-                } elseif (!is_array($tmp[$key])) {
-                    $tmp[$key] = [$tmp[$key]];
-                }
-                $tmp = &$tmp[$key];
+        $tmp = &$array;
+        foreach ($keyOrKeyPath as $key) {
+            if (!isset($tmp[$key])) {
+                $tmp[$key] = [];
+            } elseif (!is_array($tmp[$key])) {
+                $tmp[$key] = [$tmp[$key]];
             }
+            $tmp = &$tmp[$key];
+        }
+        if ($overrideExistingValue) {
             $tmp = $value;
         } else {
-            $array[$keyOrKeyPath] = $value;
+            if (!is_array($tmp)) {
+                $tmp = [$tmp];
+            }
+            $tmp[] = $value;
         }
+
+        return $array;
+    }
+
+    /**
+     * @param array $array
+     * @param string|string[] $keyOrKeyPath
+     *
+     * @return array
+     */
+    public static function dotUnset(array $array, $keyOrKeyPath) {
+        if (is_string($keyOrKeyPath)) {
+            $keyOrKeyPath = explode('.', $keyOrKeyPath);
+        }
+        $tmp     = &$array;
+        $lastKey = array_pop($keyOrKeyPath);
+        foreach ($keyOrKeyPath as $key) {
+            if (!isset($tmp[$key]) || !is_array($tmp[$key])) {
+                return $array;
+            }
+            $tmp = &$tmp[$key];
+        }
+        unset($tmp[$lastKey]);
 
         return $array;
     }
