@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\File\Model;
+namespace Oforge\Engine\File\Models;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,6 +23,16 @@ class File extends AbstractModel {
      */
     private $id;
     /**
+     * @var DateTimeImmutable $createdAt
+     * @ORM\Column(name="created_at", type="datetime_immutable", nullable=false)
+     */
+    private $createdAt;
+    /**
+     * @var DateTimeImmutable $updatedAt
+     * @ORM\Column(name="updated_at", type="datetime_immutable", nullable=false)
+     */
+    private $updatedAt;
+    /**
      * @var string $typeGroup
      * @ORM\Column(name="type_group", type="string", nullable=false)
      */
@@ -32,6 +42,11 @@ class File extends AbstractModel {
      * @ORM\Column(name="mime_type", type="string", nullable=false)
      */
     private $mimeType;
+    /**
+     * @var int $size
+     * @ORM\Column(name="size", type="integer", nullable=false)
+     */
+    private $size;
     /**
      * @var string $filePath
      * @ORM\Column(name="file_path", type="text", nullable=false)
@@ -43,15 +58,10 @@ class File extends AbstractModel {
      */
     private $uploaderID = null;
     /**
-     * @var DateTimeImmutable $createdAt
-     * @ORM\Column(name="created_at", type="datetime_immutable", nullable=false)
+     * @var array $meta
+     * @ORM\Column(name="file_meta", type="array", nullable=false)
      */
-    private $createdAt;
-    /**
-     * @var DateTimeImmutable $updatedAt
-     * @ORM\Column(name="updated_at", type="datetime_immutable", nullable=false)
-     */
-    private $updatedAt;
+    private $meta = [];
 
     /**
      * File constructor.
@@ -77,6 +87,20 @@ class File extends AbstractModel {
      */
     public function getID() : int {
         return $this->id;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getCreatedAt() : DateTimeImmutable {
+        return $this->createdAt;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getUpdatedAt() : DateTimeImmutable {
+        return $this->updatedAt;
     }
 
     /**
@@ -111,6 +135,24 @@ class File extends AbstractModel {
      */
     public function setMimeType(string $mimeType) : File {
         $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSize() : int {
+        return $this->size;
+    }
+
+    /**
+     * @param int $size
+     *
+     * @return File
+     */
+    public function setSize(int $size) : File {
+        $this->size = $size;
 
         return $this;
     }
@@ -152,17 +194,21 @@ class File extends AbstractModel {
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return array
      */
-    public function getCreatedAt() : DateTimeImmutable {
-        return $this->createdAt;
+    public function getMeta() : array {
+        return $this->meta;
     }
 
     /**
-     * @return DateTimeImmutable
+     * @param array $meta
+     *
+     * @return File
      */
-    public function getUpdatedAt() : DateTimeImmutable {
-        return $this->updatedAt;
+    public function setMeta(array $meta) : File {
+        $this->meta = $meta;
+
+        return $this;
     }
 
 }

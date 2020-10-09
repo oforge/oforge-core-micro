@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\File\Model;
+namespace Oforge\Engine\File\Models;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oforge\Engine\Core\Abstracts\AbstractModel;
@@ -14,12 +14,12 @@ use Oforge\Engine\Core\Abstracts\AbstractModel;
  */
 class FileMimeType extends AbstractModel {
     /**
-     * @var string $id
-     * @ORM\Column(name="id", type="string", nullable=false)
+     * @var string $mimeType
+     * @ORM\Column(name="mime_type", type="string", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="NONE")
      */
-    private $id;
+    private $mimeType;
     /**
      * @var string|null $fileExtension
      * @ORM\Column(name="file_extension", type="string", nullable=true)
@@ -35,13 +35,6 @@ class FileMimeType extends AbstractModel {
      * @ORM\Column(name="allowed", type="boolean", options={"default":false})
      */
     private $allowed = false;
-
-    /**
-     * @return string
-     */
-    public function getId() : string {
-        return $this->id;
-    }
 
     /**
      * @return string
@@ -102,13 +95,20 @@ class FileMimeType extends AbstractModel {
     }
 
     /**
-     * @param string $id
+     * @return string
+     */
+    public function getMimeType() : string {
+        return $this->mimeType;
+    }
+
+    /**
+     * @param string $mimeType
      *
      * @return FileMimeType
      */
     protected function setMimeType(string $mimeType) : FileMimeType {
-        if (!isset($this->id)) {
-            $this->id = $mimeType;
+        if (!isset($this->mimeType)) {
+            $this->mimeType = strtolower($mimeType);
         }
 
         return $this;

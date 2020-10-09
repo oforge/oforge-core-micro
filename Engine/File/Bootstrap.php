@@ -2,8 +2,6 @@
 
 namespace Oforge\Engine\File;
 
-use Oforge\Engine\File\Service\FileService;
-use Oforge\Engine\File\Service\MimeTypeService;
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
 
 /**
@@ -18,22 +16,24 @@ class Bootstrap extends AbstractBootstrap {
      */
     public function __construct() {
         $this->services = [
-            'file'          => FileService::class,
-            'file.mimeType' => MimeTypeService::class,
+            'file'          => Services\FileService::class,
+            'file.import'   => Services\FileImportService::class,
+            'file.mimeType' => Services\AllowedFileMimeTypeService::class,
+            // 'file.usage'    => Services\FileUsageService::class,
         ];
         $this->models   = [
-            Model\File::class,
-            Model\FileMimeType::class,
+            Models\File::class,
+            // Models\FileUsage::class,
+            Models\FileMimeType::class,
         ];
     }
 
     /** @inheritdoc */
     public function install() {
         parent::install();
-        /** @var MimeTypeService $mimeTypeService */
+        /** @var Services\AllowedFileMimeTypeService $mimeTypeService */
         $mimeTypeService = Oforge()->Services()->get('file.mimeType');
         $mimeTypeService->install();
     }
-
 
 }

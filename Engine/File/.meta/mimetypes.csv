@@ -12,7 +12,7 @@ application/xml;xml;file;true
 application/json;json;file;true
 application/javascript;js;file;true
 application/zip;zip;file;true
-application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;file;true
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;xslx;file;true
 application/vnd.openxmlformats-officedocument.wordprocessingml.document;docx;file;true
 application/pdf;pdf;file;true
 video/mp4;mp4;video;true

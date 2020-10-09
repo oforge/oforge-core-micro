@@ -1,25 +1,28 @@
 <?php
 
-namespace Oforge\Engine\File\Service;
+namespace Oforge\Engine\File\Services;
 
 use Doctrine\ORM\ORMException;
 use Exception;
+use Oforge\Engine\Cache\Helper\Cache;
+use Oforge\Engine\Cache\Lib\ArrayCache;
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Core\Helper\CsvHelper;
-use Oforge\Engine\File\Model\FileMimeType;
+use Oforge\Engine\File\Models\FileMimeType;
 
 /**
- * Class MimeTypeService
+ * Class AllowedFileMimeTypeService
  *
  * @package Oforge\Engine\File\Service
  */
-class MimeTypeService extends AbstractDatabaseAccess {
+class AllowedFileMimeTypeService extends AbstractDatabaseAccess {
+    /** @var ArrayCache $cache */
+    private $cache;
 
-    /**
-     * MimeTypeService constructor.
-     */
+    /** AllowedFileMimeTypeService constructor. */
     public function __construct() {
         parent::__construct(FileMimeType::class);
+        $this->cache = Cache::initArrayCache();
     }
 
     /**
@@ -30,8 +33,9 @@ class MimeTypeService extends AbstractDatabaseAccess {
             CsvHelper::read(dirname(__DIR__) . '/.meta/mimetypes.csv', function (array $row) {
                 $this->addMimeType([
                     'mimeType'  => strtolower($row[0]),
-                    'typeGroup' => strtolower($row[1]),
-                    'allowed'   => ((bool) $row && $row !== 'false'),
+                    'fileExtension' => strtolower($row[1]),
+                    'typeGroup' => strtolower($row[2]),
+                    'allowed'   => ((bool) $row[3] && $row[3] !== 'false'),
                 ]);
             });
         } catch (Exception $exception) {
@@ -41,6 +45,8 @@ class MimeTypeService extends AbstractDatabaseAccess {
 
     /**
      * @param array $config
+     *
+     * @return bool
      */
     public function addMimeType(array $config) : bool {
         try {
@@ -50,6 +56,7 @@ class MimeTypeService extends AbstractDatabaseAccess {
                 if ($entity === null) {
                     $entity = FileMimeType::create($config);
                     $this->entityManager()->create($entity);
+                    $this->cache->set($entity->getMimeType(), $entity);
                 }
 
                 return true;
@@ -100,7 +107,7 @@ class MimeTypeService extends AbstractDatabaseAccess {
         return $entity->isAllowed();
     }
 
-    public function getMimeTypeExtension(string $mimeType) {
+    public function getMimeTypeExtension(string $mimeType) : ?string {
         /** @var FileMimeType $entity */
         $entity = $this->getByMimeType($mimeType);
         if ($entity === null) {
@@ -110,11 +117,25 @@ class MimeTypeService extends AbstractDatabaseAccess {
         return $entity->getFileExtension();
     }
 
-    protected function getByMimeType(string $mimeType) : ?FileMimeType {
-        /** @var FileMimeType|null $entity */
-        $entity = $this->repository()->findOneBy(['id' => strtolower($mimeType)]);
+    public function getMimeTypeGroup(string $mimeType) : ?string {
+        /** @var FileMimeType $entity */
+        $entity = $this->getByMimeType($mimeType);
+        if ($entity === null) {
+            return null;
+        }
 
-        return $entity;
+        return $entity->getTypeGroup();
+    }
+
+    protected function getByMimeType(string $mimeType) : ?FileMimeType {
+        $mimeType = strtolower($mimeType);
+
+        return $this->cache->getOrCreate($mimeType, function () use ($mimeType) {
+            /** @var FileMimeType|null $entity */
+            $entity = $this->repository()->findOneBy(['mimeType' => $mimeType]);
+
+            return $entity;
+        });
     }
 
     protected function isConfigValid(array $config) : bool {
