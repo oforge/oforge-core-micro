@@ -169,8 +169,8 @@ abstract class AbstractClassPropertyAccess {
             /** @var AbstractModel $result */
             if ($maxDepth > 0) {
                 return $result->toArray($maxDepth - 1, $excludeProperties);
-            } elseif (method_exists($result, 'getId')) {
-                return $result->getId();
+            } elseif (method_exists($result, 'getID')) {
+                return $result->getID();
             }
 
             return null;

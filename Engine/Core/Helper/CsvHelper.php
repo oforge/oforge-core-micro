@@ -63,7 +63,7 @@ class CsvHelper {
         $splFileObject->setFlags($flags);
         $splFileObjectIterator = new LimitIterator($splFileObject, $startLine);
         foreach ($splFileObjectIterator as $csvRow) {
-            if (is_array($csvRow)) {
+            if (!empty($csvRow) && is_array($csvRow)) {
                 $rowCallable($csvRow);
             }
         }

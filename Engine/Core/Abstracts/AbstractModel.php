@@ -26,7 +26,7 @@ abstract class AbstractModel extends AbstractClassPropertyAccess {
         $result = [];
 
         if (!is_array($result)) {
-            $cache[get_class($result) . '::::' . $this->getId()] = true;
+            $cache[get_class($result) . '::::' . $this->getID()] = true;
         }
 
         foreach (get_class_methods($this) as $classMethod) {
@@ -59,12 +59,12 @@ abstract class AbstractModel extends AbstractClassPropertyAccess {
         } elseif (is_subclass_of($result, AbstractModel::class)) {
             /** @var AbstractModel $result */
             if (method_exists($result, 'getId')) {
-                if ($maxDepth > 0 && !isset($cache[get_class($result) . '::::' . $result->getId()])) {
-                    $cache[get_class($result) . '::::' . $result->getId()] = true;
+                if ($maxDepth > 0 && !isset($cache[get_class($result) . '::::' . $result->getID()])) {
+                    $cache[get_class($result) . '::::' . $result->getID()] = true;
 
                     return $result->toCleanedArray($maxDepth - 1, $cache);
                 } else {
-                    return $result->getId();
+                    return $result->getID();
                 }
 
             }
