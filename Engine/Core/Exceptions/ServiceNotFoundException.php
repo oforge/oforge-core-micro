@@ -2,14 +2,14 @@
 
 namespace Oforge\Engine\Core\Exceptions;
 
-use Exception;
+use Oforge\Engine\Core\Exceptions\Basic\NotFoundException;
 
 /**
  * Class ServiceNotFoundException
  *
  * @package Oforge\Engine\Core\Exceptions
  */
-class ServiceNotFoundException extends Exception {
+class ServiceNotFoundException extends NotFoundException {
 
     /**
      * ServiceNotFoundException constructor.

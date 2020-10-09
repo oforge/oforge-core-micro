@@ -2,14 +2,14 @@
 
 namespace Oforge\Engine\Core\Exceptions;
 
-use Exception;
+use Oforge\Engine\Core\Exceptions\Basic\NotFoundException;
 
 /**
  * Class ParentNotFoundException
  *
  * @package Oforge\Engine\Core\Exceptions
  */
-class ParentNotFoundException extends Exception {
+class ParentNotFoundException extends NotFoundException {
 
     /**
      * ConfigElementNotFoundException constructor.
