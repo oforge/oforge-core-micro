@@ -2,12 +2,23 @@
 
 namespace Oforge\Engine\Crud\Controller\Traits;
 
+use Doctrine\ORM\ORMException;
+use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Helper\ArrayHelper;
-use Oforge\Engine\Core\Manager\Events\Event;
+use Oforge\Engine\Crud\Enum\CrudDataAccessLevel;
 use Oforge\Engine\Crud\Enum\CrudDataType;
+use Oforge\Engine\File\Exceptions\FileImportException;
+use Oforge\Engine\File\Exceptions\FileNotFoundException;
+use Oforge\Engine\File\Exceptions\MimeTypeNotAllowedException;
+use Oforge\Engine\File\Services\FileManagementService;
 use Slim\Http\Request;
 use Slim\Http\UploadedFile;
 
+/**
+ * Trait CrudFileUploadHandlingTrait
+ *
+ * @package Oforge\Engine\Crud\Controller\Traits
+ */
 trait CrudFileUploadHandlingTrait {
 
     /**
@@ -16,30 +27,38 @@ trait CrudFileUploadHandlingTrait {
      * @param array $data
      * @param Request $request
      * @param string $context
+     *
+     * @throws FileImportException
+     * @throws FileNotFoundException
+     * @throws MimeTypeNotAllowedException
+     * @throws ORMException
+     * @throws ServiceNotFoundException
      */
     protected function handleFileUploads(array &$data, Request $request, string $context) {
         $files = $request->getUploadedFiles();
         if (empty($files)) {
             return;
         }
-        $walkFiles = function (array $files, string $propertyParent = '') use (&$data, &$walkFiles, $context) {
+        $walkFiles = function ($files, string $propertyParent = '') use (&$data, &$walkFiles, $context) {
+            /** @var UploadedFile[] $files */
             foreach ($files as $key => $value) {
                 $propertyPath = ltrim($propertyParent . '.' . $key, '.');
                 if (is_array($value)) {
                     $walkFiles($value, $propertyPath);
                 } else {
-                    $file = $value;
-                    if ($file->getError() !== UPLOAD_ERR_OK) {
-                        return;
+                    $uploadedFile = $value;
+                    if ($uploadedFile->getError() !== UPLOAD_ERR_OK) {
+                        continue;
                     }
-                    $modelProperty = ArrayHelper::dotGet($this->modelProperties, $propertyPath, null);
-                    if ($modelProperty === null) {
-                        return;
+                    $propertyConfig = ArrayHelper::dotGet($this->modelProperties, $propertyPath, null);
+                    if ($propertyConfig === null || CrudDataType::FILE !== $propertyConfig['type']) {
+                        continue;
                     }
-                    if (CrudDataType::FILE !== $modelProperty['type']) {
-                        return;
+                    $accessLevel = ($context === 'update' ? CrudDataAccessLevel::UPDATE : CrudDataAccessLevel::CREATE);
+                    if ($this->strictWriteMode && ArrayHelper::get($propertyConfig, 'mode', CrudDataAccessLevel::OFF) < $accessLevel) {
+                        continue;
                     }
-                    $this->handleUploadedFile($data, $propertyPath, $file, $context);
+                    $this->handleUploadedFile($data, $propertyPath, $uploadedFile, $context);
                 }
             }
         };
@@ -53,21 +72,19 @@ trait CrudFileUploadHandlingTrait {
      * @param string $propertyPath
      * @param UploadedFile $uploadedFile
      * @param string $context
+     *
+     * @throws FileImportException
+     * @throws FileNotFoundException
+     * @throws MimeTypeNotAllowedException
+     * @throws ORMException
+     * @throws ServiceNotFoundException
      */
     protected function handleUploadedFile(array &$data, string $propertyPath, UploadedFile $uploadedFile, string $context) {
-        $result = Oforge()->Events()->trigger(Event::create('crud.handleUploadedFile', [
-            'file'    => $uploadedFile,
-            'model'   => $this->model,
-            'context' => $context,
-        ]), null, true);
-        $data   = ArrayHelper::dotSet($data, $propertyPath, $result);
-        // TODO replace later Core-FileModule
-        // /** @var FileService $fileService */
-        // $fileService = Oforge()->Services()->get('file');
-        // $file = $fileService->addUploadedFile($uploadedFile);
-        // if ($file !== null) {
-        //     $data = ArrayHelper::dotSet($data, $propertyPath, $file->getID());
-        // }
+        /** @var FileManagementService $fileManagementService */
+        $fileManagementService = Oforge()->Services()->get('file');
+
+        $file = $fileManagementService->importUploadedFile($uploadedFile);
+        $data = ArrayHelper::dotSet($data, $propertyPath, $file->getId());
     }
 
 }
