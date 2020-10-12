@@ -22,11 +22,9 @@ use Oforge\Engine\Crud\Enum\CrudDataType;
 class KeyValueController {
     use TraitInitializer, CrudBaseTrait, CrudBundleCrudActionsTrait;
 
-    /**
-     * KeyValueController constructor.
-     */
+    /** KeyValueController constructor. */
     public function __construct() {
-        [EndpointAction::class, EndpointMethod::class];// Required for imports in nested traits
+        [AssetBundlesMode::class, EndpointAction::class, EndpointMethod::class];// Required for imports in nested traits
 
         $this->model = KeyValue::class;
 

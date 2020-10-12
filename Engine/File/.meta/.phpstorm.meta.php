@@ -7,10 +7,10 @@ namespace PHPSTORM_META {
          * Services
          */
         override(\Oforge\Engine\Core\Manager\Services\ServiceManager::get(0), map([
-            'file'          => \Oforge\Engine\File\Services\FileService::class,
-            'file.import'   => \Oforge\Engine\File\Services\FileImportService::class,
+            'file.access'          => \Oforge\Engine\File\Services\FileAccessService::class,
+            'file.management'   => \Oforge\Engine\File\Services\FileManagementService::class,
             'file.mimeType' => \Oforge\Engine\File\Services\AllowedFileMimeTypeService::class,
-            // 'file.usage'    => \Oforge\Engine\File\Services\FileUsageService::class,
+            'file.usage'    => \Oforge\Engine\File\Services\FileUsageService::class,
         ]));
         /**
          * Events

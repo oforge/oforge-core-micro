@@ -4,10 +4,14 @@ namespace Oforge\Engine\File\Services;
 
 use Doctrine\ORM\ORMException;
 use Exception;
+use InvalidArgumentException;
 use Oforge\Engine\Cache\Helper\Cache;
 use Oforge\Engine\Cache\Lib\ArrayCache;
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
+use Oforge\Engine\Core\Exceptions\ConfigOptionKeyNotExistException;
+use Oforge\Engine\Core\Helper\ArrayHelper;
 use Oforge\Engine\Core\Helper\CsvHelper;
+use Oforge\Engine\Core\Services\ConfigService;
 use Oforge\Engine\File\Models\FileMimeType;
 
 /**
@@ -32,10 +36,10 @@ class AllowedFileMimeTypeService extends AbstractDatabaseAccess {
         try {
             CsvHelper::read(dirname(__DIR__) . '/.meta/mimetypes.csv', function (array $row) {
                 $this->addMimeType([
-                    'mimeType'  => strtolower($row[0]),
+                    'mimeType'      => strtolower($row[0]),
                     'fileExtension' => strtolower($row[1]),
-                    'typeGroup' => strtolower($row[2]),
-                    'allowed'   => ((bool) $row[3] && $row[3] !== 'false'),
+                    'typeGroup'     => strtolower($row[2]),
+                    'allowed'       => ((bool) $row[3] && $row[3] !== 'false'),
                 ]);
             });
         } catch (Exception $exception) {
@@ -95,18 +99,27 @@ class AllowedFileMimeTypeService extends AbstractDatabaseAccess {
      * @param string $mimeType
      *
      * @return bool
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function isMimeTypeAllowed(string $mimeType) : bool {
         /** @var FileMimeType $entity */
         $entity = $this->getByMimeType($mimeType);
         if ($entity === null) {
-            // TODO setting default value
-            return false;
+            /** @var ConfigService $configService */
+            $configService = Oforge()->Services()->get('config');
+
+            /** @noinspection PhpUnhandledExceptionInspection */
+            return $configService->get('file_import_mime_type_restriction');
         }
 
         return $entity->isAllowed();
     }
 
+    /**
+     * @param string $mimeType
+     *
+     * @return string|null
+     */
     public function getMimeTypeExtension(string $mimeType) : ?string {
         /** @var FileMimeType $entity */
         $entity = $this->getByMimeType($mimeType);
@@ -117,6 +130,11 @@ class AllowedFileMimeTypeService extends AbstractDatabaseAccess {
         return $entity->getFileExtension();
     }
 
+    /**
+     * @param string $mimeType
+     *
+     * @return string|null
+     */
     public function getMimeTypeGroup(string $mimeType) : ?string {
         /** @var FileMimeType $entity */
         $entity = $this->getByMimeType($mimeType);
@@ -127,6 +145,11 @@ class AllowedFileMimeTypeService extends AbstractDatabaseAccess {
         return $entity->getTypeGroup();
     }
 
+    /**
+     * @param string $mimeType
+     *
+     * @return FileMimeType|null
+     */
     protected function getByMimeType(string $mimeType) : ?FileMimeType {
         $mimeType = strtolower($mimeType);
 
@@ -138,8 +161,51 @@ class AllowedFileMimeTypeService extends AbstractDatabaseAccess {
         });
     }
 
+    /**
+     * @param array $config
+     *
+     * @return bool
+     * @throws ConfigOptionKeyNotExistException
+     * @throws InvalidArgumentException
+     */
     protected function isConfigValid(array $config) : bool {
-        //TODO isConfigValid
+        $requiredKeys = [
+            'mimeType',
+            'typeGroup',
+            'allowed',
+        ];
+        foreach ($requiredKeys as $requiredKey) {
+            if (!isset($config[$requiredKey])) {
+                throw new ConfigOptionKeyNotExistException($requiredKey);
+            }
+        }
+        $types = [
+            'mimeType'      => 'string',
+            'fileExtension' => '?string',
+            'typeGroup'     => 'string',
+            'allowed'       => 'bool',
+        ];
+        foreach ($types as $key => $type) {
+            $value = ArrayHelper::get($config, $key);
+            switch ($type) {
+                case '?string':
+                    if ($value !== null && !is_string($value)) {
+                        throw new InvalidArgumentException("Config value '$key' must be of string or null.");
+                    }
+                    break;
+                case 'bool':
+                    if (!is_bool($value)) {
+                        throw new InvalidArgumentException("Config value '$key' must be of bool.");
+                    }
+                    break;
+                case 'string':
+                    if (!is_string($value)) {
+                        throw new InvalidArgumentException("Config value '$key' must be of bool.");
+                    }
+                    break;
+            }
+        }
+
         return true;
     }
 

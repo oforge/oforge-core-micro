@@ -11,10 +11,13 @@ use Oforge\Engine\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Core\Helper\Statics;
 use Oforge\Engine\Core\Helper\StringHelper;
 use Oforge\Engine\Core\Manager\Events\Event;
+use Oforge\Engine\File\Exceptions\FileEntryNotFoundException;
 use Oforge\Engine\File\Exceptions\FileImportException;
+use Oforge\Engine\File\Exceptions\FileInUsageException;
 use Oforge\Engine\File\Exceptions\FileNotFoundException;
 use Oforge\Engine\File\Exceptions\MimeTypeNotAllowedException;
 use Oforge\Engine\File\Models\File;
+use Oforge\Engine\File\Traits\Service\FileAccessServiceTrait;
 use Slim\Http\UploadedFile;
 
 /**
@@ -22,7 +25,9 @@ use Slim\Http\UploadedFile;
  *
  * @package Oforge\Engine\File\Service
  */
-class FileImportService extends AbstractDatabaseAccess {
+class FileManagementService extends AbstractDatabaseAccess {
+    use FileAccessServiceTrait;
+
     /**
      * Rename options:
      *      [
@@ -46,6 +51,30 @@ class FileImportService extends AbstractDatabaseAccess {
     }
 
     /**
+     * @param int $fileID
+     *
+     * @throws FileEntryNotFoundException
+     * @throws FileInUsageException
+     * @throws ORMException
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    public function delete(int $fileID) {
+        $file = $this->FileAccessService()->getOneByID($fileID);
+        if ($file === null) {
+            throw new FileEntryNotFoundException('id', $fileID);
+        }
+        /** @var FileUsageService $fileUsageService */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $fileUsageService = Oforge()->Services()->get('file.usage');
+        if ($fileUsageService->isFileInUsage($fileID)) {
+            throw new FileInUsageException($fileID);
+        }
+        $fileData = $file->toArray();
+        $this->entityManager()->remove($file);
+        Oforge()->Events()->trigger(Event::create(File::class . '::removed', $fileData));
+    }
+
+    /**
      * @param array $FILE
      * @param array $options [<br>
      *      'rename' => [], // Optional, see FileService::OPTIONS_RENAME<br>
@@ -57,10 +86,10 @@ class FileImportService extends AbstractDatabaseAccess {
      * @throws FileNotFoundException
      * @throws MimeTypeNotAllowedException
      * @throws ORMException
-     * @see FileImportService::OPTIONS_META
-     * @see FileImportService::OPTIONS_RENAME
+     * @see FileManagementService::OPTIONS_META
+     * @see FileManagementService::OPTIONS_RENAME
      */
-    public function addFilesEntry(array $FILE, array $options = []) {
+    public function importFilesEntry(array $FILE, array $options = []) {
         if (!isset($FILE['error'])
             || !isset($FILE['tmp_name'])
             || !isset($FILE['name'])
@@ -105,8 +134,8 @@ class FileImportService extends AbstractDatabaseAccess {
      * @throws FileNotFoundException
      * @throws MimeTypeNotAllowedException
      * @throws ORMException
-     * @see FileImportService::OPTIONS_META
-     * @see FileImportService::OPTIONS_RENAME
+     * @see FileManagementService::OPTIONS_META
+     * @see FileManagementService::OPTIONS_RENAME
      * @noinspection PhpDocRedundantThrowsInspection
      */
     public function importUploadedFile(UploadedFile $uploadedFile, array $options = []) {
@@ -141,6 +170,39 @@ class FileImportService extends AbstractDatabaseAccess {
     }
 
     /**
+     * @param string $url
+     * @param string|null $dstFilename
+     * @param array $options [<br>
+     *      'rename' => [], // Optional, see FileService::OPTIONS_RENAME<br>
+     *      'meta'   => [], // Optional, see FileService::OPTIONS_META<br>
+     *      ]
+     *
+     * @return File
+     * @throws FileImportException
+     * @throws FileNotFoundException
+     * @throws MimeTypeNotAllowedException
+     * @throws ORMException
+     */
+    public function importFromUrl(string $url, ?string $dstFilename = null, array $options = []) : File {
+        if ($dstFilename === null) {
+            $dstFilename = basename($url);
+        }
+        $dstFilename = $this->prepareFilename($dstFilename, $options);
+        $tmpFolder   = FileSystemHelper::getTempFolder(true);
+        $tmpFile     = $tmpFolder . Statics::GLOBAL_SEPARATOR . $dstFilename;
+        set_time_limit(0); // unlimited max execution time
+        file_put_contents($tmpFile, fopen($url, 'r'));
+        set_time_limit(OFORGE_SCRIPT_TIMEOUT);
+        try {
+            return $this->importLocalFile($tmpFile, false);
+        } catch (FileNotFoundException | FileImportException | MimeTypeNotAllowedException | ORMException $exception) {
+            throw $exception;
+        } finally {
+            FileSystemHelper::delete($tmpFolder);
+        }
+    }
+
+    /**
      * @param string $srcFilePath
      * @param bool $copyFile
      * @param array $options [<br>
@@ -155,8 +217,8 @@ class FileImportService extends AbstractDatabaseAccess {
      * @throws FileNotFoundException
      * @throws MimeTypeNotAllowedException
      * @throws ORMException
-     * @see FileImportService::OPTIONS_META
-     * @see FileImportService::OPTIONS_RENAME
+     * @see FileManagementService::OPTIONS_META
+     * @see FileManagementService::OPTIONS_RENAME
      */
     public function importLocalFile(string $srcFilePath, bool $copyFile = false, array $options = []) : File {
         if (!file_exists($srcFilePath)) {
@@ -195,39 +257,6 @@ class FileImportService extends AbstractDatabaseAccess {
             if ($tmpFolder !== null) {
                 FileSystemHelper::delete($tmpFolder);
             }
-        }
-    }
-
-    /**
-     * @param string $url
-     * @param string|null $dstFilename
-     * @param array $options [<br>
-     *      'rename' => [], // Optional, see FileService::OPTIONS_RENAME<br>
-     *      'meta'   => [], // Optional, see FileService::OPTIONS_META<br>
-     *      ]
-     *
-     * @return File
-     * @throws FileImportException
-     * @throws FileNotFoundException
-     * @throws MimeTypeNotAllowedException
-     * @throws ORMException
-     */
-    public function downloadFromUrl(string $url, ?string $dstFilename = null, array $options = []) : File {
-        if ($dstFilename === null) {
-            $dstFilename = basename($url);
-        }
-        $dstFilename = $this->prepareFilename($dstFilename, $options);
-        $tmpFolder   = FileSystemHelper::getTempFolder(true);
-        $tmpFile     = $tmpFolder . Statics::GLOBAL_SEPARATOR . $dstFilename;
-        set_time_limit(0); // unlimited max execution time
-        file_put_contents($tmpFile, fopen($url, 'r'));
-        set_time_limit(OFORGE_SCRIPT_TIMEOUT);
-        try {
-            return $this->importLocalFile($tmpFile, false);
-        } catch (FileNotFoundException | FileImportException | MimeTypeNotAllowedException | ORMException $exception) {
-            throw $exception;
-        } finally {
-            FileSystemHelper::delete($tmpFolder);
         }
     }
 

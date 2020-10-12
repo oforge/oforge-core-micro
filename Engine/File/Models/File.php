@@ -17,7 +17,7 @@ use Oforge\Engine\Core\Abstracts\AbstractModel;
 class File extends AbstractModel {
     /**
      * @var int $id
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned"=true})
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */

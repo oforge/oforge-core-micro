@@ -2,7 +2,7 @@
 
 namespace Oforge\Engine\File\Exceptions;
 
-use Oforge\Engine\Core\Exceptions\NotFoundException;
+use Oforge\Engine\Core\Exceptions\Basic\NotFoundException;
 
 /**
  * Class FileNotFoundException
