@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Core\Exceptions;
+namespace Oforge\Engine\Core\Exceptions\Basic;
 
 use Exception;
 
@@ -14,10 +14,10 @@ class NotFoundException extends Exception {
     /**
      * NotFoundException constructor.
      *
-     * @param string $text
+     * @param string $message
      */
-    public function __construct(string $text) {
-        parent::__construct($text);
+    public function __construct(string $message) {
+        parent::__construct($message);
     }
 
 }

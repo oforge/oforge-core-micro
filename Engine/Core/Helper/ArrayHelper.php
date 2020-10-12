@@ -165,7 +165,7 @@ class ArrayHelper {
      * @return mixed
      */
     public static function dotGet(array $array, string $key, $default = null) {
-        if (empty($array) ||empty($key)) {
+        if (empty($array) || empty($key)) {
             return $default;
         }
         if (strpos($key, '.') !== false) {

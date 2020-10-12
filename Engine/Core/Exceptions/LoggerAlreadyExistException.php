@@ -2,14 +2,14 @@
 
 namespace Oforge\Engine\Core\Exceptions;
 
-use Exception;
+use Oforge\Engine\Core\Exceptions\Basic\AlreadyExistException;
 
 /**
  * Class LoggerAlreadyExistException
  *
  * @package Oforge\Engine\Core\Exceptions
  */
-class LoggerAlreadyExistException extends Exception {
+class LoggerAlreadyExistException extends AlreadyExistException {
 
     /**
      * LoggerAlreadyExistException constructor.
