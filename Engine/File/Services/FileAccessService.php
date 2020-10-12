@@ -16,12 +16,6 @@ class FileAccessService extends AbstractDatabaseAccess {
     /** FileService constructor. */
     public function __construct() {
         parent::__construct(File::class);
-        $f = new File();
-        $props = (new \ReflectionClass($f))->getProperties();
-        foreach ($props as $prop) {
-            print $prop->getName() . "<br>\n";
-        }
-        die();
     }
 
     /**

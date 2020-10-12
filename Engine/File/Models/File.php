@@ -85,7 +85,7 @@ class File extends AbstractModel {
     /**
      * @return int
      */
-    public function getID() : int {
+    public function getId() : int {
         return $this->id;
     }
 

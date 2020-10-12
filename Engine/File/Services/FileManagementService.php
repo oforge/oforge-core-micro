@@ -328,7 +328,7 @@ class FileManagementService extends AbstractDatabaseAccess {
                 $this->entityManager()->create($file);
 
                 $eventData = [
-                    'fileID'           => $file->getID(),
+                    'fileID'           => $file->getId(),
                     'file'             => $file,
                     'filename'         => $filename,
                     'absoluteFilePath' => $absoluteFilePath,
