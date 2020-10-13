@@ -49,6 +49,8 @@ class Bootstrap extends AbstractBootstrap {
         $this->services = [
             'console' => ConsoleService::class,
         ];
+
+        $this->order = 2;
     }
 
 }

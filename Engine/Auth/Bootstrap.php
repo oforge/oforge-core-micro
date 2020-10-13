@@ -34,6 +34,8 @@ class Bootstrap extends AbstractBootstrap {
             'permissions'   => PermissionService::class,
             'user'          => UserService::class
         ];
+
+        $this->order = 2;
     }
 
     public function install() {

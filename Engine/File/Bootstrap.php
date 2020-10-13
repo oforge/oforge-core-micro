@@ -31,6 +31,8 @@ class Bootstrap extends AbstractBootstrap {
             Models\FileUsage::class,
             Models\FileMimeType::class,
         ];
+
+        $this->order = 2;
     }
 
     /** @inheritdoc */

@@ -11,4 +11,9 @@ use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
  */
 class Bootstrap extends AbstractBootstrap {
 
+    /** Bootstrap constructor. */
+    public function __construct() {
+        $this->order = 1;
+    }
+
 }

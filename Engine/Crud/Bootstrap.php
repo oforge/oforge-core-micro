@@ -23,6 +23,8 @@ class Bootstrap extends AbstractBootstrap {
         $this->services = [
             'crud' => GenericCrudService::class,
         ];
+
+        $this->order = 1;
     }
 
 }
