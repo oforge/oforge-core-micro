@@ -16,11 +16,11 @@ abstract class AbstractClassPropertyAccess {
      * Fluent interface for constructor so methods can be called after construction.
      *
      * @param array $array
-     * @param array $fillable optional property whitelist for mass-assignment
+     * @param string[] $fillable optional property whitelist for mass-assignment
      *
      * @return static
      */
-    public static function create(array $array = [], array $fillable = []) {
+    public static function create(array $array = [], $fillable = []) {
         $object = new static();
         $object->fromArray($array, $fillable);
 
@@ -32,25 +32,23 @@ abstract class AbstractClassPropertyAccess {
      * Will call (existing) setter method for every key. Supports both key formats "testKey" and "test_key".
      *
      * @param array $array
-     * @param array $whitelist
+     * @param string[] $whitelist
      *
      * @return $this
      */
-    public function fromArray(array $array = [], array $whitelist = []) {
+    public function fromArray(array $array = [], $whitelist = []) {
         $hasWhitelist = !empty($whitelist);
         $whitelist    = array_fill_keys($whitelist, 1);
         foreach ($array as $propertyName => $value) {
-            if ($hasWhitelist && !isset($whitelist[$propertyName])) {
-                continue;
-            }
-            $propertyName = ucfirst( $propertyName );
+            $propertyNameRaw = $propertyName;
+            $propertyName    = ucfirst($propertyName);
             if (strpos($propertyName, '_') !== false) {
                 $propertyName = implode('', array_map('ucfirst', explode('_', $propertyName)));
                 if ($hasWhitelist && !isset($whitelist[$propertyName])) {
                     continue;
                 }
             }
-            if ($hasWhitelist && !isset($whitelist[$propertyName])) {
+            if ($hasWhitelist && !isset($whitelist[$propertyName]) && !isset($whitelist[$propertyNameRaw])) {
                 continue;
             }
             $getMethodName = 'get' . $propertyName;
@@ -79,7 +77,7 @@ abstract class AbstractClassPropertyAccess {
                                 } elseif (is_subclass_of($className, AbstractClassPropertyAccess::class)) {
                                     if (is_array($value)) {
                                         $valueArray = $value;
-                                        $value = $this->$getMethodName();
+                                        $value      = $this->$getMethodName();
                                         if ($value === null) {
                                             $value = new $className();
                                         }
@@ -169,8 +167,8 @@ abstract class AbstractClassPropertyAccess {
             /** @var AbstractModel $result */
             if ($maxDepth > 0) {
                 return $result->toArray($maxDepth - 1, $excludeProperties);
-            } elseif (method_exists($result, 'getId')) {
-                return $result->getId();
+            } elseif (method_exists($result, 'getID')) {
+                return $result->getID();
             }
 
             return null;

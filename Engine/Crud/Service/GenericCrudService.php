@@ -153,12 +153,12 @@ class GenericCrudService extends AbstractDatabaseAccess {
      * @param string $class
      * @param array|callable $criteria
      * @param array|null $orderBy
-     * @param int|null $offset
      * @param int|null $limit
+     * @param int|null $offset
      *
      * @return AbstractModel[]
      */
-    public function listByExtendedCriteria(string $class, $criteria = [], array $orderBy = null, ?int $offset = null, ?int $limit = null) : array {
+    public function listByExtendedCriteria(string $class, $criteria = [], array $orderBy = null, ?int $limit = null, ?int $offset = null) : array {
         $queryBuilder = $this->getRepository($class)->createQueryBuilder('e');
         $this->evaluateExtendedCriteria($queryBuilder, $criteria);
         if (!empty($orderBy)) {

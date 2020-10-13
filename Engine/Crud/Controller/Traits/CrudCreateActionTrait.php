@@ -52,6 +52,9 @@ trait CrudCreateActionTrait {
         }
     }
 
+    /**
+     * @return array
+     */
     private function prepareCreateDefaultData() : array {
         $data = [];
         foreach ($this->modelProperties as $property => $propertyConfig) {

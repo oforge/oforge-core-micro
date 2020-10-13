@@ -28,6 +28,26 @@ class FileSystemHelper {
     }
 
     /**
+     * Generate temp folder path and optional create it.
+     *
+     * @param bool $mkdir mkdir folder?
+     * @param bool $returnAbsolutePath Return absolute path or relative path (to oforge root).
+     *
+     * @return string
+     */
+    public static function getTempFolder(bool $mkdir, bool $returnAbsolutePath = true) : string {
+        do {
+            $tmpFolderRelative = Statics::DIR_TMP . Statics::GLOBAL_SEPARATOR . md5(rand());
+            $tmpFolderAbsolute = ROOT_PATH . $tmpFolderRelative;
+        } while (file_exists($tmpFolderAbsolute));
+        if ($mkdir) {
+            FileSystemHelper::mkdir($tmpFolderAbsolute);
+        }
+
+        return $returnAbsolutePath ? $tmpFolderAbsolute : $tmpFolderRelative;
+    }
+
+    /**
      * Delete single file or directory.
      * Directories can optionally be recursively deleted and empty directories will not be deleted.
      *
@@ -217,7 +237,7 @@ class FileSystemHelper {
         if (isset(self::$findCache[$context])) {
             return self::$findCache[$context];
         }
-        $cacheFile = ROOT_PATH . Statics::CACHE_DIR . Statics::GLOBAL_SEPARATOR . $context . '.cache.php';
+        $cacheFile = ROOT_PATH . Statics::DIR_CACHE . Statics::GLOBAL_SEPARATOR . $context . '.cache.php';
 
         if (file_exists($cacheFile) && Oforge()->Settings()->isProductionMode()) {
             $result = ArrayPhpFileStorage::load($cacheFile);

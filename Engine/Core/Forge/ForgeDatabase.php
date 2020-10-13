@@ -26,7 +26,7 @@ use Oforge\Engine\Core\Helper\Statics;
  * @package Oforge\Engine\Core\Models
  */
 class ForgeDatabase {
-    private const PATH_CACHE_FILE = ROOT_PATH . Statics::DB_CACHE_FILE;
+    private const PATH_CACHE_FILE = ROOT_PATH . Statics::FILE_CACHE_DB;
     /** @var ForgeDatabase $instance */
     protected static $instance = null;
     /** @var ForgeEntityManager $forgeEntityManager */
@@ -110,7 +110,7 @@ class ForgeDatabase {
             $this->configuration->setAutoGenerateProxyClasses(false);
         }
 
-        $this->configuration->setProxyDir(ROOT_PATH . Statics::PROXY_CACHE_DIR);
+        $this->configuration->setProxyDir(ROOT_PATH . Statics::DIR_CACHE_PROXY);
 
         $this->configuration->addCustomStringFunction('ST_Distance_Sphere', ST_Distance_Sphere::class);
         $this->configuration->addCustomStringFunction('POINT', POINT::class);
