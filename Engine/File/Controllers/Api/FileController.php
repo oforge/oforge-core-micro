@@ -133,7 +133,7 @@ class FileController {
         try {
             /** @var FileManagementService $fileManagementService */
             $fileManagementService = Oforge()->Services()->get('file.management');
-            $fileManagementService->delete($args['id']);
+            $fileManagementService->remove($args['id']);
 
             return $response->withStatus(204);
         } catch (FileEntryNotFoundException $exception) {
