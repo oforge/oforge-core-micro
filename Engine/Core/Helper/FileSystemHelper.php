@@ -48,16 +48,16 @@ class FileSystemHelper {
     }
 
     /**
-     * Delete single file or directory.
-     * Directories can optionally be recursively deleted and empty directories will not be deleted.
+     * Remove single file or directory.
      *
      * @param string $path Path to file or directory
-     * @param bool $recursive Delete directory recursive?
-     * @param bool $deleteEmptyDirs Delete empty directories?
+     * @param bool $recursive Remove directories recursive?
+     * @param bool $removeFilesInDirs Removing of files if path is directory?
+     * @param bool $removeEmptyDirs Remove empty path directory?
      *
      * @return bool
      */
-    public static function delete(string $path, bool $recursive = false, bool $deleteEmptyDirs = true) : bool {
+    public static function remove(string $path, bool $recursive = false, bool $removeFilesInDirs = true, bool $removeEmptyDirs = true) : bool {
         if (empty($path)) {
             return false;
         }
@@ -65,12 +65,24 @@ class FileSystemHelper {
         if (is_dir($path)) {
             $filenames = array_diff(scandir($path), ['.', '..']);
             $success   = true;
-            foreach ($filenames as $filename) {
-                if ($recursive) {
-                    $success &= self::delete($path . Statics::GLOBAL_SEPARATOR . $filename, $recursive, $deleteEmptyDirs);
+            foreach ($filenames as $index => $filename) {
+                $filepath = $path . Statics::GLOBAL_SEPARATOR . $filename;
+                $removed  = false;
+                if (is_dir($filepath)) {
+                    if ($recursive) {
+                        $removed = self::remove($filepath, $recursive, $removeFilesInDirs, $removeEmptyDirs);
+                    }
+                } else {
+                    if ($removeFilesInDirs) {
+                        $removed = self::remove($filepath, $recursive, $removeFilesInDirs, $removeEmptyDirs);
+                    }
                 }
+                if ($removed) {
+                    unset($filenames[$index]);
+                }
+                $success &= $removed;
             }
-            if ($deleteEmptyDirs) {
+            if (empty($filenames) && $removeEmptyDirs) {
                 $tmp = @rmdir($path);
                 if (!$tmp) {
                     Oforge()->Logger()->get()->warning('Could not delete directory: ' . $path);
