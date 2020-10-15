@@ -28,7 +28,7 @@ class DevDoctrineOrmCacheCleanupCommand extends AbstractCommand {
      */
     public function handle(Input $input, Logger $output) : void {
         $directory = ROOT_PATH . Statics::DIR_CACHE;
-        if (FileSystemHelper::delete($directory, true)) {
+        if (FileSystemHelper::remove($directory, true)) {
             $output->notice('Doctrine orm cache directory cleared.');
         } else {
             $output->notice('Doctrine orm cache directory could not be cleared.');

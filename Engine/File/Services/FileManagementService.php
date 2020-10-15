@@ -11,6 +11,7 @@ use Oforge\Engine\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Core\Helper\Statics;
 use Oforge\Engine\Core\Helper\StringHelper;
 use Oforge\Engine\Core\Manager\Events\Event;
+use Oforge\Engine\File\Enums\FileTypeGroup;
 use Oforge\Engine\File\Exceptions\FileEntryNotFoundException;
 use Oforge\Engine\File\Exceptions\FileImportException;
 use Oforge\Engine\File\Exceptions\FileInUsageException;
@@ -21,7 +22,7 @@ use Oforge\Engine\File\Traits\Service\FileAccessServiceTrait;
 use Slim\Http\UploadedFile;
 
 /**
- * Class FileImportService
+ * Class FileManagementService
  *
  * @package Oforge\Engine\File\Service
  */
@@ -45,40 +46,16 @@ class FileManagementService extends AbstractDatabaseAccess {
      */
     public const OPTIONS_META = [];
 
-    /** FileImportService constructor. */
+    /** FileManagementService constructor. */
     public function __construct() {
         parent::__construct(File::class);
     }
 
     /**
-     * @param int $fileID
-     *
-     * @throws FileEntryNotFoundException
-     * @throws FileInUsageException
-     * @throws ORMException
-     * @noinspection PhpDocMissingThrowsInspection
-     */
-    public function delete(int $fileID) {
-        $file = $this->FileAccessService()->getOneByID($fileID);
-        if ($file === null) {
-            throw new FileEntryNotFoundException('id', $fileID);
-        }
-        /** @var FileUsageService $fileUsageService */
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $fileUsageService = Oforge()->Services()->get('file.usage');
-        if ($fileUsageService->isFileInUsage($fileID)) {
-            throw new FileInUsageException($fileID);
-        }
-        $fileData = $file->toArray();
-        $this->entityManager()->remove($file);
-        Oforge()->Events()->trigger(Event::create(File::class . '::removed', $fileData));
-    }
-
-    /**
      * @param array $FILE
      * @param array $options [<br>
-     *      'rename' => [], // Optional, see FileService::OPTIONS_RENAME<br>
-     *      'meta'   => [], // Optional, see FileService::OPTIONS_META<br>
+     *      'meta'   => [], // Optional, see FileManagementService::OPTIONS_META<br>
+     *      'rename' => [], // Optional, see FileManagementService::OPTIONS_RENAME<br>
      *      ]
      *
      * @return File
@@ -118,15 +95,15 @@ class FileManagementService extends AbstractDatabaseAccess {
         } catch (FileNotFoundException | FileImportException | MimeTypeNotAllowedException | ORMException $exception) {
             throw $exception;
         } finally {
-            FileSystemHelper::delete($tmpFolder);
+            FileSystemHelper::remove($tmpFolder);
         }
     }
 
     /**
      * @param UploadedFile $uploadedFile
      * @param array $options [<br>
-     *      'rename' => [], // Optional, see FileService::OPTIONS_RENAME<br>
-     *      'meta'   => [], // Optional, see FileService::OPTIONS_META<br>
+     *      'meta'   => [], // Optional, see FileManagementService::OPTIONS_META<br>
+     *      'rename' => [], // Optional, see FileManagementService::OPTIONS_RENAME<br>
      *      ]
      *
      * @return File
@@ -165,7 +142,7 @@ class FileManagementService extends AbstractDatabaseAccess {
         } catch (FileNotFoundException | FileImportException | MimeTypeNotAllowedException | ORMException $exception) {
             throw $exception;
         } finally {
-            FileSystemHelper::delete($tmpFolder);
+            FileSystemHelper::remove($tmpFolder);
         }
     }
 
@@ -173,8 +150,8 @@ class FileManagementService extends AbstractDatabaseAccess {
      * @param string $url
      * @param string|null $dstFilename
      * @param array $options [<br>
-     *      'rename' => [], // Optional, see FileService::OPTIONS_RENAME<br>
-     *      'meta'   => [], // Optional, see FileService::OPTIONS_META<br>
+     *      'meta'   => [], // Optional, see FileManagementService::OPTIONS_META<br>
+     *      'rename' => [], // Optional, see FileManagementService::OPTIONS_RENAME<br>
      *      ]
      *
      * @return File
@@ -182,6 +159,8 @@ class FileManagementService extends AbstractDatabaseAccess {
      * @throws FileNotFoundException
      * @throws MimeTypeNotAllowedException
      * @throws ORMException
+     * @see FileManagementService::OPTIONS_META
+     * @see FileManagementService::OPTIONS_RENAME
      */
     public function importFromUrl(string $url, ?string $dstFilename = null, array $options = []) : File {
         if ($dstFilename === null) {
@@ -198,7 +177,7 @@ class FileManagementService extends AbstractDatabaseAccess {
         } catch (FileNotFoundException | FileImportException | MimeTypeNotAllowedException | ORMException $exception) {
             throw $exception;
         } finally {
-            FileSystemHelper::delete($tmpFolder);
+            FileSystemHelper::remove($tmpFolder);
         }
     }
 
@@ -206,8 +185,8 @@ class FileManagementService extends AbstractDatabaseAccess {
      * @param string $srcFilePath
      * @param bool $copyFile
      * @param array $options [<br>
-     *      'rename' => [], // Optional, see FileService::OPTIONS_RENAME<br>
-     *      'meta'   => [], // Optional, see FileService::OPTIONS_META<br>
+     *      'meta'   => [], // Optional, see FileManagementService::OPTIONS_META<br>
+     *      'rename' => [], // Optional, see FileManagementService::OPTIONS_RENAME<br>
      *      'deleteAfterImport' => bool(false), // If $copyFile=true: Delete source file after import?<br>
      *      'prefixAfterImport' => ?string, // If $copyFile=true: Rename file with prefix after import, eg _<old_filename>?<br>
      *      ]<br>
@@ -255,20 +234,59 @@ class FileManagementService extends AbstractDatabaseAccess {
             throw $exception;
         } finally {
             if ($tmpFolder !== null) {
-                FileSystemHelper::delete($tmpFolder);
+                FileSystemHelper::remove($tmpFolder);
             }
         }
     }
 
     /**
+     * @param int $fileID
+     *
+     * @throws FileEntryNotFoundException
+     * @throws FileInUsageException
+     * @throws ORMException
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    public function remove(int $fileID) {
+        $file = $this->FileAccessService()->getOneByID($fileID);
+        if ($file === null) {
+            throw new FileEntryNotFoundException('id', $fileID);
+        }
+        /** @var FileUsageService $fileUsageService */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $fileUsageService = Oforge()->Services()->get('file.usage');
+        if ($fileUsageService->isFileInUsage($fileID)) {
+            throw new FileInUsageException($fileID);
+        }
+        $fileData = $file->toArray();
+        $this->entityManager()->remove($file);
+        Oforge()->Events()->trigger(Event::create(File::class . '::removed', $fileData));
+        //Remove files & empty folders
+        $absoluteFilePath = ROOT_PATH . $file->getFilePath();
+        if (FileSystemHelper::remove($absoluteFilePath)) {
+            $parentFolder = dirname($absoluteFilePath);
+            if (FileSystemHelper::remove($parentFolder, false, false)) {
+                FileSystemHelper::remove(dirname($absoluteFilePath), false, false);
+            }
+            // with removing of extra files?
+            // if (FileSystemHelper::remove($parentFolder)) {
+            //     FileSystemHelper::remove(dirname($absoluteFilePath), false, false);
+            // }
+        }
+    }
+
+    /**
      * @param array $data
-     * @param array $options
+     * @param array $options [<br>
+     *      'meta'   => [], // Optional, see FileManagementService::OPTIONS_META<br>
+     *      ]<br>
      *
      * @return File
      * @throws FileImportException
      * @throws FileNotFoundException
      * @throws MimeTypeNotAllowedException
      * @throws ORMException
+     * @see FileManagementService::OPTIONS_META
      */
     protected function importFile(array $data, array $options) : File {
         $src      = $data['src'];
@@ -292,7 +310,7 @@ class FileManagementService extends AbstractDatabaseAccess {
         if ($typeGroup === null) {
             $mimeTypePrefix = StringHelper::substringBefore($mimeType, '/');
 
-            $typeGroup = in_array($mimeTypePrefix, ['audio', 'image', 'video']) ? $mimeTypePrefix : 'file';
+            $typeGroup = FileTypeGroup::isValid($mimeTypePrefix) ? $mimeTypePrefix : FileTypeGroup::DEFAULT;
         }
         $meta       = ArrayHelper::get($options, 'meta', []);
         $uploaderID = ArrayHelper::pop($meta, 'uploaderID', null);
@@ -327,12 +345,11 @@ class FileManagementService extends AbstractDatabaseAccess {
                 ]);
                 $this->entityManager()->create($file);
 
-                $eventData = [
-                    'fileID'           => $file->getId(),
-                    'file'             => $file,
-                    'filename'         => $filename,
+                $eventData = array_merge($file->toArray(), [
+                    'entity'           => $file,
                     'absoluteFilePath' => $absoluteFilePath,
-                ];
+                ]);
+
                 Oforge()->Events()->trigger(Event::create(File::class . '::created', $eventData));
 
                 return $file;
@@ -342,7 +359,7 @@ class FileManagementService extends AbstractDatabaseAccess {
         } catch (ORMException | FileImportException $exception) {
             throw $exception;
         } finally {
-            FileSystemHelper::delete($folderPath);
+            FileSystemHelper::remove($folderPath);
         }
     }
 
@@ -350,9 +367,12 @@ class FileManagementService extends AbstractDatabaseAccess {
      * Prepare target filename.
      *
      * @param string $filename
-     * @param array $options
+     * @param array $options [<br>
+     *      'rename' => [], // Optional, see FileManagementService::OPTIONS_RENAME<br>
+     *      ]<br>
      *
      * @return string
+     * @see FileManagementService::OPTIONS_RENAME
      */
     protected function prepareFilename(string $filename, array $options) : string {
         $extension     = FileHelper::getExtension($filename);
@@ -370,7 +390,7 @@ class FileManagementService extends AbstractDatabaseAccess {
             $filename = $filename . $suffix;
         }
 
-        return ($this->normalizeFilename($filename) . '.' . $extension);
+        return ($this->normalizeFilename($filename) . '.' . strtolower($extension));
     }
 
     /**

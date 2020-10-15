@@ -4,6 +4,11 @@ namespace Oforge\Engine\Core\Helper;
 
 use Oforge\Engine\File\Enums\MimeType;
 
+/**
+ * Class FileHelper
+ *
+ * @package Oforge\Engine\Core\Helper
+ */
 class FileHelper {
 
     /** Prevent instance. */
@@ -49,6 +54,7 @@ class FileHelper {
 
     /**
      * Replacing of file path extension.
+     * If MimeType is not supported by Method Oforge\Engine\File\Enums\MimeType::getExtension, the original file path is returned.
      *
      * @param string $filePath
      * @param string $mimeType See Oforge\Engine\File\Enums\MimeType.
@@ -56,7 +62,12 @@ class FileHelper {
      * @return string
      */
     public static function replaceExtensionByMimeType(string $filePath, string $mimeType) : string {
-        return self::replaceExtension($filePath, MimeType::getExtension($mimeType));
+        $newExtension = MimeType::getExtension($mimeType);
+        if ($newExtension === null) {
+            return $filePath;
+        }
+
+        return self::replaceExtension($filePath, $newExtension);
     }
 
     /**
@@ -67,9 +78,10 @@ class FileHelper {
      * @return string
      */
     public static function trimExtension($filePath) : string {
-        $data = pathinfo($filePath);
-        
-        return ltrim(ArrayHelper::get($data, 'dirname', '') . Statics::GLOBAL_SEPARATOR . $data['filename'], Statics::GLOBAL_SEPARATOR);
+        $data     = pathinfo($filePath);
+        $trailing = (substr($filePath, 0, 1) === Statics::GLOBAL_SEPARATOR ? Statics::GLOBAL_SEPARATOR : '');
+
+        return $trailing . ltrim(ArrayHelper::get($data, 'dirname', '') . Statics::GLOBAL_SEPARATOR . $data['filename'], Statics::GLOBAL_SEPARATOR);
     }
 
 }
