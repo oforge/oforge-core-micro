@@ -2,18 +2,18 @@
 
 namespace Oforge\Engine\Image\Exceptions;
 
-use Oforge\Engine\Image\Exceptions\Basic\ImageModifyException;
+use Oforge\Engine\Image\Exceptions\Basic\ImageException;
 use Throwable;
 
 /**
- * Class ImageConvertException
+ * Class ImageUnsupportedMimeTypeException
  *
  * @package Oforge\Engine\Image\Exceptions
  */
-class ImageConvertException extends ImageModifyException {
+class ImageUnsupportedMimeTypeException extends ImageException {
 
     /**
-     * ImageConvertException constructor.
+     * ImageUnsupportedMimeTypeException constructor.
      *
      * @param string $message
      * @param Throwable|null $previous

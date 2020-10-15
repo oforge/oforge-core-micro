@@ -10,28 +10,30 @@ namespace Oforge\Engine\Image\Lib;
 class ImageHandlerFallback extends ImageHandler {
 
     /** @inheritdoc */
-    public function compress(int $quality) {
-        return $this;
+    public static function load(string $filePath) {
+        return new static('none');
     }
 
     /** @inheritdoc */
-    public function convert(string $dstMimeType) {
-        return $this;
-    }
-
-    /** @inheritdoc */
-    public function resize($options) {
-        return $this;
-    }
-
-    /** @inheritdoc */
-    public function load(string $srcFilePath) {
-        return $this;
-    }
-
-    /** @inheritdoc */
-    public function save(string $dstFilePath) : void {
+    public function save(string $filePath) : void {
         // nothing to do
+    }
+
+    /** @inheritdoc */
+    protected function cleanup() : void {
+        // nothing to do
+    }
+
+    /** @inheritdoc */
+    protected function getCurrentWidth() : int {
+        // nothing to do
+        return 0;
+    }
+
+    /** @inheritdoc */
+    protected function getCurrentHeight() : int {
+        // nothing to do
+        return 0;
     }
 
 }

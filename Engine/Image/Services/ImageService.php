@@ -8,6 +8,7 @@ use Oforge\Engine\Core\Helper\FileHelper;
 use Oforge\Engine\Core\Manager\Events\Event;
 use Oforge\Engine\Core\Services\ConfigService;
 use Oforge\Engine\File\Enums\FileTypeGroup;
+use Oforge\Engine\File\Enums\MimeType;
 use Oforge\Engine\File\Exceptions\FileNotFoundException;
 use Oforge\Engine\File\Models\File;
 use Oforge\Engine\File\Traits\Service\FileAccessServiceTrait;
@@ -19,6 +20,7 @@ use Oforge\Engine\Image\Exceptions\ImageConvertException;
 use Oforge\Engine\Image\Exceptions\ImageLoadException;
 use Oforge\Engine\Image\Exceptions\ImageResizeException;
 use Oforge\Engine\Image\Exceptions\ImageSaveException;
+use Oforge\Engine\Image\Exceptions\ImageUnsupportedMimeTypeException;
 use Oforge\Engine\Image\Lib\ImageHandler;
 use Oforge\Engine\Image\Lib\ImageHandlerFallback;
 use Oforge\Engine\Image\Lib\ImageHandlerGD;
@@ -35,6 +37,7 @@ class ImageService {
     /** @var string $imageHandlerClass */
     private $imageHandlerClass;
 
+    /** ImageService constructor. */
     public function __construct() {
         $this->initImageHandlerClass();
 
@@ -97,26 +100,29 @@ class ImageService {
                                        . '.' . FileHelper::getExtension($relativeSrcFilePath);
 
                 $absoluteDstFilePath = ROOT_PATH . $relativeDstFilePath;
+                $recheckFileExist    = false;
                 if (!file_exists($absoluteDstFilePath)) {
                     try {
-                        try {
-                            /** @var ConfigService $configService */
-                            $configService = Oforge()->Services()->get('config');
-                            $quality       = $configService->get('image_access_quality');
-                        } catch (Exception $exception) {
-                            Oforge()->Logger()->logException($exception, ImageConstants::LOGGER);
-                            $quality = ImageConstants::DEFAULT_QUALITY;
-                        }
-                        $imageHandler = $this->initImageHandler();
-                        $imageHandler->load($absoluteSrcFilePath)#
-                                     ->resize($options)#
-                                     ->compress($quality)#
+                        /** @var ConfigService $configService */
+                        $configService = Oforge()->Services()->get('config');
+                        $quality       = $configService->get('image_access_quality');
+                    } catch (Exception $exception) {
+                        Oforge()->Logger()->logException($exception, ImageConstants::LOGGER);
+                        $quality = ImageConstants::DEFAULT_QUALITY;
+                    }
+                    try {
+                        $imageHandler = $this->initImageHandler($absoluteSrcFilePath);
+                        $imageHandler->setSize($options)#
+                                     ->setQuality($quality)#
                                      ->save($absoluteDstFilePath);
+                        $recheckFileExist = true;
                     } catch (FileNotFoundException | ImageIOException | ImageModifyException $exception) {
                         Oforge()->Logger()->logException($exception, ImageConstants::LOGGER);
+                    } catch (ImageUnsupportedMimeTypeException $exception) {
+                        // ignore
                     }
                 }
-                if (file_exists($absoluteDstFilePath)) {
+                if ($recheckFileExist && file_exists($absoluteDstFilePath)) {
                     return $relativeDstFilePath;
                 }
             }
@@ -155,13 +161,20 @@ class ImageService {
      * @param int $quality
      *
      * @throws FileNotFoundException
+     * @throws ImageUnsupportedMimeTypeException
      * @throws ImageLoadException
      * @throws ImageCompressException
      * @throws ImageSaveException
      */
     public function compress(string $srcFilePath, ?string $dstFilePath, int $quality = ImageConstants::DEFAULT_QUALITY) {
         $dstFilePath = $this->resolveDstFilePath($srcFilePath, $dstFilePath);
-        $this->initImageHandler()->load($srcFilePath)->compress($quality)->save($dstFilePath);
+        try {
+            $this->initImageHandler($srcFilePath)->setQuality($quality)->save($dstFilePath);
+        } catch (ImageConvertException | ImageResizeException $exception) {
+            // should technically not happen
+            Oforge()->Logger()->logException($exception, ImageConstants::LOGGER);
+            throw new ImageSaveException('Unexpected error: ' . $exception->getMessage(), $exception);
+        }
     }
 
     /**
@@ -170,13 +183,21 @@ class ImageService {
      * @param string $dstMimeType Value of image mime types in Oforge\Engine\File\Enums\MimeType.
      *
      * @throws FileNotFoundException
+     * @throws ImageUnsupportedMimeTypeException
      * @throws ImageLoadException
      * @throws ImageConvertException
      * @throws ImageSaveException
+     * @see MimeType
      */
     public function convert(string $srcFilePath, ?string $dstFilePath, string $dstMimeType) {
         $dstFilePath = $this->resolveDstFilePath($srcFilePath, $dstFilePath);
-        $this->initImageHandler()->load($srcFilePath)->convert($dstMimeType)->save($dstFilePath);
+        try {
+            $this->initImageHandler($srcFilePath)->setMimeType($dstMimeType)->save($dstFilePath);
+        } catch (ImageCompressException | ImageResizeException $exception) {
+            // should technically not happen
+            Oforge()->Logger()->logException($exception, ImageConstants::LOGGER);
+            throw new ImageSaveException('Unexpected error: ' . $exception->getMessage(), $exception);
+        }
     }
 
     /**
@@ -187,27 +208,28 @@ class ImageService {
      * Key 'compress': Int value with $quality (between 0 and 100).
      *
      * @throws FileNotFoundException
+     * @throws ImageUnsupportedMimeTypeException
      * @throws ImageLoadException
      * @throws ImageCompressException
      * @throws ImageConvertException
      * @throws ImageResizeException
      * @throws ImageSaveException
+     * @see MimeType
      */
     public function modify(string $srcFilePath, ?string $dstFilePath, array $options) {
         $dstFilePath  = $this->resolveDstFilePath($srcFilePath, $dstFilePath);
-        $imageHandler = $this->initImageHandler();
-        $imageHandler->load($srcFilePath);
+        $imageHandler = $this->initImageHandler($srcFilePath);
         if (isset($options['compress'])) {
             $quality = $options['compress'];
-            $imageHandler->compress($quality);
+            $imageHandler->setQuality($quality);
         }
         if (isset($options['convert'])) {
             $dstMimeType = $options['convert'];
-            $imageHandler->convert($dstMimeType);
+            $imageHandler->setMimeType($dstMimeType);
         }
         if (isset($options['resize'])) {
             $resizeOptions = $options['resize'];
-            $imageHandler->resize($resizeOptions);
+            $imageHandler->setSize($resizeOptions);
         }
         $imageHandler->save($dstFilePath);
     }
@@ -218,13 +240,20 @@ class ImageService {
      * @param array<string,int>|int $options Width (int) or array with keys 'width' and/or 'height' with int values.
      *
      * @throws FileNotFoundException
+     * @throws ImageUnsupportedMimeTypeException
      * @throws ImageLoadException
      * @throws ImageResizeException
      * @throws ImageSaveException
      */
     public function resize(string $srcFilePath, ?string $dstFilePath, $options) {
         $dstFilePath = $this->resolveDstFilePath($srcFilePath, $dstFilePath);
-        $this->initImageHandler()->load($srcFilePath)->resize($options)->save($dstFilePath);
+        try {
+            $this->initImageHandler($srcFilePath)->setSize($options)->save($dstFilePath);
+        } catch (ImageCompressException | ImageConvertException $exception) {
+            // should technically not happen
+            Oforge()->Logger()->logException($exception, ImageConstants::LOGGER);
+            throw new ImageSaveException('Unexpected error: ' . $exception->getMessage(), $exception);
+        }
     }
 
     /**
@@ -249,26 +278,30 @@ class ImageService {
     }
 
     /**
+     * @param string $filePath
+     *
      * @return ImageHandler
+     * @throws FileNotFoundException
+     * @throws ImageUnsupportedMimeTypeException
+     * @throws ImageLoadException
      */
-    protected function initImageHandler() : ImageHandler {
+    protected function initImageHandler(string $filePath) : ImageHandler {
+        /** @var ImageHandler $class */
         $class = $this->imageHandlerClass;
 
-        return new $class();
+        return $class::load($filePath);
     }
 
     /**
      * Init ImageHandler. Will use first available framework of Imagick > GD > Fallback.
-     *
-     * @noinspection PhpUnhandledExceptionInspection
      */
     protected function initImageHandlerClass() {
         if (extension_loaded('imagick')) {
-            $this->setImageHandlerClass(ImageHandlerImagick::class);
+            $this->imageHandlerClass = ImageHandlerImagick::class;
         } elseif (extension_loaded('gd')) {
-            $this->setImageHandlerClass(ImageHandlerGD::class);
+            $this->imageHandlerClass = ImageHandlerGD::class;
         } else {
-            $this->setImageHandlerClass(ImageHandlerFallback::class);
+            $this->imageHandlerClass = ImageHandlerFallback::class;
         }
     }
 
