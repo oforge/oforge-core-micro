@@ -141,6 +141,8 @@ class ImageHandlerGD extends ImageHandler {
         if (isset($this->changes['quality'])) {
             $quality = $this->resolveQuality($this->changes['quality']);
         }
+
+        $filePath = FileHelper::replaceExtensionByMimeType($filePath, $mimeType);
         switch ($mimeType) {
             case MimeType::IMAGE_GIF:
                 imagesavealpha($this->image, true);

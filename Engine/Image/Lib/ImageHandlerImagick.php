@@ -141,7 +141,8 @@ class ImageHandlerImagick extends ImageHandler {
                 break;
         }
 
-        $success = $this->imagick->writeImage($filePath);
+        $filePath = FileHelper::replaceExtensionByMimeType($filePath, $mimeType);
+        $success  = $this->imagick->writeImage($filePath);
         $this->cleanup();
         if (!$success) {
             throw new ImageSaveException(self::$exceptionPrefix . ': Could not save image to: ' . $filePath);

@@ -51,13 +51,13 @@ abstract class ImageHandler {
      * @throws ImageUnsupportedMimeTypeException
      */
     protected static function checkLoadMimeType(string $mimeType) {
-        $supported = !isset(static::$supportedMimeTypes[$mimeType]);
+        $supported = isset(static::$supportedMimeTypes[$mimeType]);
         if ($supported && $mimeType === MimeType::IMAGE_WEBP) {
             /** @noinspection SpellCheckingInspection */
             $supported = function_exists('imagewebp') && function_exists('imagecreatefromwebp');
         }
         if (!$supported) {
-            throw new ImageUnsupportedMimeTypeException(static::$exceptionPrefix . "%s: Image of mime type '$mimeType' are not supported.");
+            throw new ImageUnsupportedMimeTypeException(static::$exceptionPrefix . ": Image of mime type '$mimeType' are not supported.");
         }
     }
 
@@ -115,7 +115,7 @@ abstract class ImageHandler {
         $currentWidth  = $this->getCurrentWidth();
         $currentHeight = $this->getCurrentHeight();
         [$width, $height] = $this->resolveScaleSizes($currentWidth, $currentHeight, $size);
-        if ($width !== $currentWidth && $height !== $currentHeight) {
+        if ($width !== $currentWidth || $height !== $currentHeight) {
             $this->changes['resize'] = [
                 'width'  => $width,
                 'height' => $height,
@@ -148,17 +148,25 @@ abstract class ImageHandler {
      * @return int[] [width, height]
      */
     protected function resolveScaleSizes(int $currentWidth, int $currentHeight, $size) {
-        $width  = $currentWidth;
-        $height = $currentHeight;
         if (is_int($size)) {
             $width  = $size;
             $height = (int) (1.0 * $width / $currentWidth * $currentHeight);
         } else {
+            $width  = null;
+            $height = null;
             if (isset($size['width']) && is_int($size['width'])) {
                 $width = $size['width'];
             }
             if (isset($size['height']) && is_int($size['height'])) {
-                $width = $size['height'];
+                $height = $size['height'];
+            }
+            if ($width === null && $height === null) {
+                $width  = $currentWidth;
+                $height = $currentHeight;
+            } elseif ($width === null) {
+                $width = (int) (1.0 * $height / $currentHeight * $currentWidth);
+            } elseif ($height === null) {
+                $height = (int) (1.0 * $width / $currentWidth * $currentHeight);
             }
         }
 

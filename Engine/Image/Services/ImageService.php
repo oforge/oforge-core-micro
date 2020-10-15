@@ -91,16 +91,16 @@ class ImageService {
             $height = $options['height'];
         }
         $relativeSrcFilePath = $image->getFilePath();
-        if ($width > 0) {
+        if ($width > 0 || $height > 0) {
             $absoluteSrcFilePath = ROOT_PATH . $relativeSrcFilePath;
             if (file_exists($absoluteSrcFilePath)) {
                 $relativeDstFilePath = FileHelper::trimExtension($relativeSrcFilePath)#
-                                       . '-w' . $width #
+                                       . ($width > 0 ? ('-w' . $width) : '')#
                                        . ($height > 0 ? ('-h' . $height) : '')#
                                        . '.' . FileHelper::getExtension($relativeSrcFilePath);
 
                 $absoluteDstFilePath = ROOT_PATH . $relativeDstFilePath;
-                $recheckFileExist    = false;
+                $reCheckFileExist    = false;
                 if (!file_exists($absoluteDstFilePath)) {
                     try {
                         /** @var ConfigService $configService */
@@ -115,14 +115,14 @@ class ImageService {
                         $imageHandler->setSize($options)#
                                      ->setQuality($quality)#
                                      ->save($absoluteDstFilePath);
-                        $recheckFileExist = true;
+                        $reCheckFileExist = true;
                     } catch (FileNotFoundException | ImageIOException | ImageModifyException $exception) {
                         Oforge()->Logger()->logException($exception, ImageConstants::LOGGER);
                     } catch (ImageUnsupportedMimeTypeException $exception) {
                         // ignore
                     }
                 }
-                if ($recheckFileExist && file_exists($absoluteDstFilePath)) {
+                if ($reCheckFileExist && file_exists($absoluteDstFilePath)) {
                     return $relativeDstFilePath;
                 }
             }
