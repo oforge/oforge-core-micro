@@ -147,7 +147,7 @@ class Bootstrap extends AbstractBootstrap {
             'name'     => 'system_format_datetime',
             'type'     => ConfigType::STRING,
             'group'    => 'date_format',
-            'default'  => 'd.m.Y H:i:s',
+            'default'  => 'Y-m-d H:i:s',
             'label'    => 'config_system_format_datetime',
             'required' => true,
         ]);
@@ -155,7 +155,7 @@ class Bootstrap extends AbstractBootstrap {
             'name'     => 'system_format_date',
             'type'     => ConfigType::STRING,
             'group'    => 'date_format',
-            'default'  => 'd.m.Y',
+            'default'  => 'Y-m-d',
             'label'    => 'config_system_format_date',
             'required' => true,
         ]);
