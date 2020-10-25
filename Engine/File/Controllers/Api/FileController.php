@@ -3,9 +3,9 @@
 namespace Oforge\Engine\File\Controllers\Api;
 
 use Exception;
-use Oforge\Engine\Core\Annotation\Endpoint\AssetBundleMode;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointClass;
+use Oforge\Engine\Core\Annotations\Endpoint\AssetBundleMode;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointAction;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointClass;
 use Oforge\Engine\Core\Traits\Controller\TraitInitializer;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Helper\ArrayHelper;

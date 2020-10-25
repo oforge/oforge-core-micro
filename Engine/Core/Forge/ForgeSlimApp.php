@@ -36,18 +36,26 @@ class ForgeSlimApp extends SlimApp {
                 $message = $exception->getMessage();
                 Oforge()->Logger()->get()->error($message, $exception->getTrace());
 
-                echo  $message, "<br>", $exception->getTraceAsString();
-                die;
-
+                $trace = str_replace("\n", "<br />\n", $exception->getTraceAsString());
+                $file  = $exception->getFile();
+                $line  = $exception->getLine();
+                $html  = <<<TAG
+<h1>Exception: $message</h1>
+<dl>
+    <dt><strong>File</strong></dt><dd>$file</dd>
+    <dt><strong>Line</strong></dt><dd>$line</dd>
+    <dt><strong>Trace</strong></dt><dd>$trace</dd>
+</dl>
+TAG;
 
                 if (Oforge()->Settings()->isDevelopmentMode()) {
-                    return $response->withStatus(500);
+                    return $response->write($html)->withStatus(500);
                 } else {
-                    Oforge()->Logger()->get()->error($message, $exception->getTrace());
+                    // TODO something to do???
+                    return $response;
                 }
             };
         };
-
         $container['errorHandler']    = $errorHandler;
         $container['phpErrorHandler'] = $errorHandler;
 
@@ -56,9 +64,7 @@ class ForgeSlimApp extends SlimApp {
         };
     }
 
-    /**
-     * @return ForgeSlimApp
-     */
+    /** @return ForgeSlimApp */
     public static function getInstance() : ForgeSlimApp {
         if (!isset(self::$instance)) {
             self::$instance = new ForgeSlimApp();
@@ -68,44 +74,15 @@ class ForgeSlimApp extends SlimApp {
     }
 
     /**
-     * Start the session
+     * @param bool $silent
      *
-     * @param int $lifetimeSeconds
-     * @param string $path
-     * @param null $domain
-     * @param null $secure
+     * @return ResponseInterface
+     * @throws \Throwable
      */
-    public function sessionStart($lifetimeSeconds = 0, $path = '/', $domain = null, $secure = null) {
-        $sessionStatus = session_status();
-
-        if ($sessionStatus != PHP_SESSION_ACTIVE) {
-            session_name("oforge_session");
-            if (!empty($_SESSION['deleted_time'])
-                && $_SESSION['deleted_time'] < time() - 180) {
-                session_destroy();
-            }
-            // Set the domain to default to the current domain.
-            $domain = isset($domain) ? $domain : $_SERVER['SERVER_NAME'];
-
-            // Set the default secure value to whether the site is being accessed with SSL
-            $secure = isset($secure) ? $secure : isset($_SERVER['HTTPS']) ? true : false;
-
-            // Set the cookie settings and start the session
-            session_set_cookie_params($lifetimeSeconds, $path, $domain, $secure, true);
-            session_start();
-            $_SESSION['created_time'] = time();
-        }
-    }
-
     public function run($silent = false) {
-        /**
-         * @var $response ResponseInterface
-         */
+        /** @var ResponseInterface $response */
         $response = $this->getContainer()->get('response');
-
-        /**
-         * @var $request ServerRequestInterface
-         */
+        /** @var ServerRequestInterface $request */
         $request = $this->getContainer()->get('request');
 
         try {
@@ -119,6 +96,7 @@ class ForgeSlimApp extends SlimApp {
         if (!$silent) {
             $this->respond($response);
         }
+
         return $response;
     }
 
@@ -134,7 +112,7 @@ class ForgeSlimApp extends SlimApp {
             if (is_array($value)) {
                 $message .= $this->createLog($value, ltrim($keyPrefix . '.' . $key, '.'));
             } else {
-                $message .= (empty($keyPrefix) ? '' : ($keyPrefix . '.')) . $key . ' => ' . $value . "\n";;
+                $message .= ltrim($keyPrefix . '.' . $key, '.') . ' => ' . $value . "\n";;
             }
         }
 

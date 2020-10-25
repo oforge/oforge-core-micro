@@ -1,11 +1,11 @@
 <?php
 
-namespace Oforge\Engine\Core\Annotation\Endpoint;
+namespace Oforge\Engine\Core\Annotations\Endpoint;
 
 /**
  * Class AssetBundleMode
  *
- * @package Oforge\Engine\Core\Annotation\Endpoint
+ * @package Oforge\Engine\Core\Annotations\Endpoint
  */
 class AssetBundleMode {
     public const MERGE    = 'merge';

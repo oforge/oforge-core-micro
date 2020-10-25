@@ -3,8 +3,8 @@
 namespace Oforge\Engine\Core\Controllers\Api;
 
 use Oforge\Engine\Core\Abstracts\AbstractController;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointClass;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointAction;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointClass;
 use Oforge\Engine\Core\Helper\ResponseHelper;
 use Oforge\Engine\Core\Services\PingService;
 use Slim\Http\Request;

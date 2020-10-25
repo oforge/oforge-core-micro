@@ -5,9 +5,9 @@ namespace Oforge\Engine\Core\Middlewares;
 use Oforge\Engine\Core\Exceptions\ConfigElementNotFoundException;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Services\ConfigService;
-use Oforge\Engine\Core\Services\Session\SessionManagementService;
+use Oforge\Engine\Core\Services\Session\SessionService;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class SessionMiddleware
@@ -17,26 +17,23 @@ use Psr\Http\Message\ServerRequestInterface;
 class SessionMiddleware {
 
     /**
-     * @param ServerRequestInterface $request PSR7 request
+     * @param RequestInterface $request PSR7 request
      * @param ResponseInterface $response PSR7 response
      * @param callable $next Next middleware
      *
-     * @return mixed
+     * @return ResponseInterface
      * @throws ConfigElementNotFoundException
      * @throws ServiceNotFoundException
      */
-    public function __invoke($request, $response, $next) {
-        /** @var SessionManagementService $sessionManager */
-        $sessionManager = Oforge()->Services()->get('session.management');
-        $sessionManager->sessionStart();
+    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next) {
+        /** @var SessionService $sessionService */
+        $sessionService = Oforge()->Services()->get('session');
+        $sessionService->start();
         /** @var ConfigService $configService */
         $configService = Oforge()->Services()->get('config');
-        $debugMode     = $configService->get('debug_mode');
-
-        if ($debugMode) {
-            /** for debugging purposes */
-            $debugSession  = $configService->get('debug_session');
-            if ($debugSession) {
+        if ($configService->get('debug_mode')) {
+            // for debugging purposes
+            if ($configService->get('debug_session')) {
                 Oforge()->View()->assign(['debug.session' => $_SESSION]);
             }
         }

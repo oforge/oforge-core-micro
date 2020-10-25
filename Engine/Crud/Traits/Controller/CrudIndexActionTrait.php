@@ -4,8 +4,8 @@ namespace Oforge\Engine\Crud\Traits\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 use Exception;
-use Oforge\Engine\Core\Annotation\Endpoint\AssetBundleMode;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
+use Oforge\Engine\Core\Annotations\Endpoint\AssetBundleMode;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointAction;
 use Oforge\Engine\Core\Helper\ArrayHelper;
 use Oforge\Engine\Core\Helper\ResponseHelper;
 use Oforge\Engine\Core\Models\Endpoint\EndpointMethod;

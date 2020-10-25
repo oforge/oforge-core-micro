@@ -23,7 +23,7 @@ use Oforge\Engine\Core\Services\PingService;
 use Oforge\Engine\Core\Services\PluginAccessService;
 use Oforge\Engine\Core\Services\PluginStateService;
 use Oforge\Engine\Core\Services\RedirectService;
-use Oforge\Engine\Core\Services\Session\SessionManagementService;
+use Oforge\Engine\Core\Services\Session\SessionService;
 use Oforge\Engine\Core\Services\TokenService;
 
 /**
@@ -52,17 +52,17 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->services = [
-            'config'             => ConfigService::class,
-            'encryption'         => EncryptionService::class,
-            'endpoint'           => EndpointService::class,
-            'middleware'         => MiddlewareService::class,
-            'ping'               => PingService::class,
-            'plugin.access'      => PluginAccessService::class,
-            'plugin.state'       => PluginStateService::class,
-            'redirect'           => RedirectService::class,
-            'session.management' => SessionManagementService::class,
-            'store.keyvalue'     => KeyValueStoreService::class,
-            'token'              => TokenService::class,
+            'config'         => ConfigService::class,
+            'encryption'     => EncryptionService::class,
+            'endpoint'       => EndpointService::class,
+            'middleware'     => MiddlewareService::class,
+            'ping'           => PingService::class,
+            'plugin.access'  => PluginAccessService::class,
+            'plugin.state'   => PluginStateService::class,
+            'redirect'       => RedirectService::class,
+            'session'        => SessionService::class,
+            'store.keyvalue' => KeyValueStoreService::class,
+            'token'          => TokenService::class,
         ];
 
         $this->order = 0;

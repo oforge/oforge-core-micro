@@ -2,7 +2,6 @@
 
 namespace Oforge\Engine\Core\Forge;
 
-use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Cache\FilesystemCache;
@@ -15,9 +14,9 @@ use Doctrine\ORM\Query\AST\Functions\DateDiffFunction;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\SchemaValidator;
 use Doctrine\ORM\Tools\Setup;
-use Oforge\Engine\Core\Annotation\ORM\Discriminator\DiscriminatorEntryListener;
-use Oforge\Engine\Core\Forge\Doctrine\Point;
-use Oforge\Engine\Core\Forge\Doctrine\ST_Distance_Sphere;
+use Oforge\Engine\Core\Forge\ORM\Annotations\Discriminator\DiscriminatorEntryListener;
+use Oforge\Engine\Core\Forge\ORM\CustomStringFunctions\Point;
+use Oforge\Engine\Core\Forge\ORM\CustomStringFunctions\ST_Distance_Sphere;
 use Oforge\Engine\Core\Helper\Statics;
 
 /**
@@ -86,8 +85,6 @@ class ForgeDatabase {
 
     /**
      * @param array $settings
-     *
-     * @throws AnnotationException
      */
     public function init(array $settings) {
         $this->settings = $settings;
@@ -104,17 +101,19 @@ class ForgeDatabase {
         $this->configuration->setMetadataDriverImpl($annotationDriver);
         // $this->configuration->setMetadataCacheImpl($filesystemCache);
         $this->configuration->setQueryCacheImpl($filesystemCache);
-        // proxy classes: true in dev | false in production
-
-        if(!$isDevMode) {
+        if (!$isDevMode) {
             $this->configuration->setAutoGenerateProxyClasses(false);
         }
-
         $this->configuration->setProxyDir(ROOT_PATH . Statics::DIR_CACHE_PROXY);
 
-        $this->configuration->addCustomStringFunction('ST_Distance_Sphere', ST_Distance_Sphere::class);
-        $this->configuration->addCustomStringFunction('POINT', POINT::class);
-        $this->configuration->addCustomStringFunction('DATEDIFF', DateDiffFunction::class);
+        $customStringFunctions = [
+            'DATEDIFF'           => DateDiffFunction::class,
+            'POINT'              => Point::class,
+            'ST_Distance_Sphere' => ST_Distance_Sphere::class,
+        ];
+        foreach ($customStringFunctions as $name => $className) {
+            $this->configuration->addCustomStringFunction($name, $className);
+        }
     }
 
     /**
@@ -200,7 +199,7 @@ class ForgeDatabase {
      *
      * @param string[] $schema
      */
-    private function saveAddedModelSchemata($schema) {
+    private function saveAddedModelSchemata(array $schema) {
         $content = implode("\n", $schema);
         file_put_contents(self::PATH_CACHE_FILE, $content . "\n", FILE_APPEND);
     }

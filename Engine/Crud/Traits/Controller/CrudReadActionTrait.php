@@ -4,8 +4,8 @@ namespace Oforge\Engine\Crud\Traits\Controller;
 
 use Exception;
 use Monolog\Logger;
-use Oforge\Engine\Core\Annotation\Endpoint\AssetBundleMode;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
+use Oforge\Engine\Core\Annotations\Endpoint\AssetBundleMode;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointAction;
 use Oforge\Engine\Core\Helper\ResponseHelper;
 use Oforge\Engine\Core\Models\Endpoint\EndpointMethod;
 use Oforge\Engine\Crud\Exceptions\EntityNotFoundException;

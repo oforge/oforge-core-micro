@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Core\Annotation\Endpoint;
+namespace Oforge\Engine\Core\Annotations\Endpoint;
 
 use Doctrine\Common\Annotations\AnnotationException;
 
@@ -9,7 +9,7 @@ use Doctrine\Common\Annotations\AnnotationException;
  *
  * @Annotation
  * @Target({"CLASS"})
- * @package Oforge\Engine\Core\Annotation\Endpoint
+ * @package Oforge\Engine\Core\Annotations\Endpoint
  */
 class EndpointClass {
     /**

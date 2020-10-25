@@ -1,13 +1,18 @@
 <?php
 
-namespace Oforge\Engine\Core\Annotation\ORM\Discriminator;
+namespace Oforge\Engine\Core\Forge\ORM\Annotations\Discriminator;
 
 use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Doctrine\ORM\ORMException;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Class DiscriminatorEntryListener
@@ -29,9 +34,9 @@ class DiscriminatorEntryListener implements EventSubscriber {
     /**
      * Register this class in EntityManager.
      *
-     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param EntityManager $entityManager
      */
-    public static function register(\Doctrine\ORM\EntityManager $entityManager) {
+    public static function register(EntityManager $entityManager) {
         $entityManager->getEventManager()->addEventSubscriber(new static());
     }
 
@@ -47,9 +52,9 @@ class DiscriminatorEntryListener implements EventSubscriber {
     /**
      * @param LoadClassMetadataEventArgs $eventArgs
      *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \ReflectionException
-     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws ORMException
+     * @throws ReflectionException
+     * @throws AnnotationException
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs) {
         $class  = $eventArgs->getClassMetadata()->getName();
@@ -95,15 +100,15 @@ class DiscriminatorEntryListener implements EventSubscriber {
      * @param string $annotationName
      *
      * @return Annotation|null
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     protected function getAnnotationForCass(string $class, string $annotationName) {
-        $reflectionClass = new \ReflectionClass($class);
+        $reflectionClass = new ReflectionClass($class);
         if (isset($this->annotations[$reflectionClass->getName()][$annotationName])) {
             return $this->annotations[$reflectionClass->getName()][$annotationName];
         }
-        $reader     = new AnnotationReader();
+        $reader = new AnnotationReader();
+        /** @var Annotation|null $annotation */
         $annotation = $reader->getClassAnnotation($reflectionClass, $annotationName);
         if (isset($annotation)) {
             $this->annotations[$reflectionClass->getName()][$annotationName] = $annotation;
@@ -116,10 +121,9 @@ class DiscriminatorEntryListener implements EventSubscriber {
      * @param string $class
      *
      * @return bool
-     * @throws \ReflectionException
-     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws ReflectionException
      */
-    protected function isDiscriminatorParent($class) {
+    protected function isDiscriminatorParent(string $class) {
         if (!$this->getAnnotationForCass($class, self::ANNOTATION_PARENT)) {
             return false;
         }
@@ -142,11 +146,11 @@ class DiscriminatorEntryListener implements EventSubscriber {
      * @param string $currentClass
      *
      * @return bool
-     * @throws \ReflectionException
-     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws ReflectionException
+     * @throws AnnotationException
      */
-    private function isDiscriminatorChild($parentClass, $currentClass) {
-        $reflectionClass       = new \ReflectionClass($currentClass);
+    private function isDiscriminatorChild(string $parentClass, string $currentClass) {
+        $reflectionClass       = new ReflectionClass($currentClass);
         $parentReflectionClass = $reflectionClass->getParentClass();
         if ($parentReflectionClass === false) {
             return false;

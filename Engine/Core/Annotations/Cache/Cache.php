@@ -1,29 +1,20 @@
 <?php
 
-namespace Oforge\Engine\Core\Annotation\Cache;
+namespace Oforge\Engine\Core\Annotations\Cache;
 
 /**
  * Class Cache
  *
  * @Annotation
  * @Target({"METHOD", "CLASS"})
- * @package Oforge\Engine\Core\Annotation\Cache
+ * @package Oforge\Engine\Core\Annotations\Cache
  */
 class Cache {
-    /**
-     * Slot.
-     *
-     * @var string $slot
-     */
+    /** @var string $slot Slot. */
     private $slot;
-    /**
-     * @var string $duration
-     */
+    /** @var string $duration */
     private $duration;
-
-    /**
-     * @var bool $enabled
-     */
+    /** @var bool $enabled */
     private $enabled;
 
     /**

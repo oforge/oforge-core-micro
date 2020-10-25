@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Core\Annotation\Endpoint;
+namespace Oforge\Engine\Core\Annotations\Endpoint;
 
 use Oforge\Engine\Core\Models\Endpoint\EndpointMethod;
 
@@ -9,7 +9,7 @@ use Oforge\Engine\Core\Models\Endpoint\EndpointMethod;
  *
  * @Annotation
  * @Target({"METHOD"})
- * @package Oforge\Engine\Core\Annotation\Endpoint
+ * @package Oforge\Engine\Core\Annotations\Endpoint
  */
 class EndpointAction {
     /**

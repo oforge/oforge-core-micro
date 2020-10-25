@@ -1,21 +1,16 @@
 <?php
 
-namespace Oforge\Engine\Core\Annotation\Cache;
-
+namespace Oforge\Engine\Core\Annotations\Cache;
 
 /**
  * Class CacheInvalidation
  *
  * @Annotation
  * @Target({"METHOD"})
- * @package Oforge\Engine\Core\Annotation\Cache
+ * @package Oforge\Engine\Core\Annotations\Cache
  */
 class CacheInvalidation {
-    /**
-     * Slot.
-     *
-     * @var string $slot
-     */
+    /** @var string $slot Slot. */
     private $slot;
 
     /**
@@ -24,7 +19,7 @@ class CacheInvalidation {
      * @param array $config
      */
     public function __construct(array $config) {
-        $this->slot       = $config['slot'] ?? 'default';
+        $this->slot = $config['slot'] ?? 'default';
     }
 
     /**

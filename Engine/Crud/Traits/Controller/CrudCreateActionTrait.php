@@ -5,7 +5,7 @@ namespace Oforge\Engine\Crud\Traits\Controller;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Exception;
 use Monolog\Logger;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointAction;
 use Oforge\Engine\Core\Helper\ArrayHelper;
 use Oforge\Engine\Core\Helper\ResponseHelper;
 use Oforge\Engine\Core\Models\Endpoint\EndpointMethod;

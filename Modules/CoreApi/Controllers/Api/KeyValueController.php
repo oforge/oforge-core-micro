@@ -2,9 +2,9 @@
 
 namespace Oforge\Modules\CoreApi\Controllers\Api;
 
-use Oforge\Engine\Core\Annotation\Endpoint\AssetBundleMode;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
-use Oforge\Engine\Core\Annotation\Endpoint\EndpointClass;
+use Oforge\Engine\Core\Annotations\Endpoint\AssetBundleMode;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointAction;
+use Oforge\Engine\Core\Annotations\Endpoint\EndpointClass;
 use Oforge\Engine\Core\Traits\Controller\TraitInitializer;
 use Oforge\Engine\Core\Models\Endpoint\EndpointMethod;
 use Oforge\Engine\Core\Models\Store\KeyValue;
