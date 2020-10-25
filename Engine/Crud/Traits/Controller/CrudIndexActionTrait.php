@@ -76,7 +76,7 @@ trait CrudIndexActionTrait {
      * @param Response $response
      *
      * @return Response
-     * @EndpointAction(path="[/]", method=EndpointMethod::GET, assetBundles="", assetBundlesMode=AssetBundleMode::NONE)
+     * @EndpointAction(path="[/]", method=EndpointMethod::GET, assetBundles="", AssetBundleMode=AssetBundleMode::NONE)
      */
     public function indexAction(Request $request, Response $response) {
         $queryParams = $request->getQueryParams();

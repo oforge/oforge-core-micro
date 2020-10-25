@@ -25,7 +25,7 @@ trait CrudCreateActionTrait {
      * @param Response $response
      *
      * @return Response
-     * @EndpointAction(path="", method=EndpointMethod::POST, assetBundles="", assetBundlesMode=AssetBundleMode::NONE)
+     * @EndpointAction(path="", method=EndpointMethod::POST, assetBundles="", AssetBundleMode=AssetBundleMode::NONE)
      */
     public function createAction(Request $request, Response $response) {
         if (empty($data = $request->getParsedBody())) {

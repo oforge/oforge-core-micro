@@ -17,7 +17,7 @@ use Oforge\Engine\Crud\Enums\CrudDataType;
  * Class KeyValueController
  *
  * @package Oforge\Modules\CoreApi\Controllers\Api
- * @EndpointClass(path="/api/storage", name="api_storage", assetBundles=null, assetBundlesMode=AssetBundleMode::NONE)
+ * @EndpointClass(path="/api/storage", name="api_storage", assetBundles=null, AssetBundleMode=AssetBundleMode::NONE)
  */
 class KeyValueController {
     use TraitInitializer, CrudBaseTrait, CrudBundleCrudActionsTrait;

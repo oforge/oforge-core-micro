@@ -291,7 +291,7 @@ class EndpointService extends AbstractDatabaseAccess {
         $order      = null;
         $httpMethod = EndpointMethod::ANY;
 
-        $assetBundlesMode   = $classAnnotation->getAssetBundleMode();
+        $AssetBundleMode   = $classAnnotation->getAssetBundleMode();
         $classAssetBundles  = $classAnnotation->getAssetBundles();
         $methodAssetBundles = null;
 
@@ -306,7 +306,7 @@ class EndpointService extends AbstractDatabaseAccess {
         if (isset($methodAnnotation)) {
             $order              = $methodAnnotation->getOrder();
             $methodAssetBundles = $methodAnnotation->getAssetBundles();
-            $assetBundlesMode   = $methodAnnotation->getAssetBundleMode() ?? $assetBundlesMode;
+            $AssetBundleMode   = $methodAnnotation->getAssetBundleMode() ?? $AssetBundleMode;
             if (EndpointMethod::isValid($methodAnnotation->getMethod())) {
                 $httpMethod = $methodAnnotation->getMethod();
             }
@@ -326,8 +326,8 @@ class EndpointService extends AbstractDatabaseAccess {
         $path  = StringHelper::leading($path, '/');
         $order = $order ?? $classAnnotation->getOrder() ?? Statics::DEFAULT_ORDER;
 
-        $assetBundlesMode = $assetBundlesMode ?? AssetBundleMode::OVERRIDE;
-        $assetBundles     = $this->prepareEndpointAssetBundles($assetBundlesMode, $classAssetBundles, $methodAssetBundles);
+        $AssetBundleMode = $AssetBundleMode ?? AssetBundleMode::OVERRIDE;
+        $assetBundles     = $this->prepareEndpointAssetBundles($AssetBundleMode, $classAssetBundles, $methodAssetBundles);
 
         return [
             'name'             => $name,
@@ -344,13 +344,13 @@ class EndpointService extends AbstractDatabaseAccess {
     }
 
     /**
-     * @param string $assetBundlesMode
+     * @param string $AssetBundleMode
      * @param string|string[]|null $classAssetBundles
      * @param string|string[]|null $methodAssetBundles
      *
      * @return string[]
      */
-    private function prepareEndpointAssetBundles(string $assetBundlesMode, $classAssetBundles, $methodAssetBundles) {
+    private function prepareEndpointAssetBundles(string $AssetBundleMode, $classAssetBundles, $methodAssetBundles) {
         /**
          * @param string|string[]|null $values
          *
@@ -367,7 +367,7 @@ class EndpointService extends AbstractDatabaseAccess {
             return $values;
         };
 
-        switch ($assetBundlesMode) {
+        switch ($AssetBundleMode) {
             case AssetBundleMode::MERGE:
                 $assetBundles = array_unique(array_merge($convert($classAssetBundles), $convert($methodAssetBundles)));
                 break;

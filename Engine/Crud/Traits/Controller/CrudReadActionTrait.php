@@ -25,7 +25,7 @@ trait CrudReadActionTrait {
      * @param array $args
      *
      * @return Response
-     * @EndpointAction(path="/{id}", method=EndpointMethod::GET, assetBundles="", assetBundlesMode=AssetBundleMode::NONE)
+     * @EndpointAction(path="/{id}", method=EndpointMethod::GET, assetBundles="", AssetBundleMode=AssetBundleMode::NONE)
      */
     public function readAction(Request $request, Response $response, array $args) {
         try {

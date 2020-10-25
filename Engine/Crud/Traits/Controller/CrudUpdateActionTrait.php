@@ -23,7 +23,7 @@ trait CrudUpdateActionTrait {
      * @param array $args
      *
      * @return Response
-     * @EndpointAction(path="/{id}", method=EndpointMethod::PATCH, assetBundles="", assetBundlesMode=AssetBundleMode::NONE)
+     * @EndpointAction(path="/{id}", method=EndpointMethod::PATCH, assetBundles="", AssetBundleMode=AssetBundleMode::NONE)
      */
     public function updateAction(Request $request, Response $response, array $args) {
         if (empty($data = $request->getParsedBody())) {

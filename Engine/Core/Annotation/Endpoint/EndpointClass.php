@@ -58,7 +58,7 @@ class EndpointClass {
      */
     public function __construct(array $config) {
         $this->assetBundles    = $config['assetBundles'] ?? null;
-        $this->assetBundleMode = $config['assetBundlesMode'] ?? null;
+        $this->assetBundleMode = $config['AssetBundleMode'] ?? null;
 
         $this->name  = $config['name'] ?? '';
         $this->order = $config['order'] ?? null;

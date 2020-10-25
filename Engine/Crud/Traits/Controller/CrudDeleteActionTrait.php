@@ -22,7 +22,7 @@ trait CrudDeleteActionTrait {
      * @param array $args
      *
      * @return Response
-     * @EndpointAction(path="/{id}", method=EndpointMethod::DELETE, assetBundles="", assetBundlesMode=AssetBundleMode::NONE)
+     * @EndpointAction(path="/{id}", method=EndpointMethod::DELETE, assetBundles="", AssetBundleMode=AssetBundleMode::NONE)
      */
     public function deleteAction(Request $request, Response $response, array $args) {
         try {

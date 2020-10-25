@@ -60,7 +60,7 @@ class EndpointAction {
      */
     public function __construct(array $config) {
         $this->assetBundles    = $config['assetBundles'] ?? null;
-        $this->assetBundleMode = $config['assetBundlesMode'] ?? null;
+        $this->assetBundleMode = $config['AssetBundleMode'] ?? null;
 
         $this->method = $config['method'] ?? EndpointMethod::ANY;
         $this->name   = $config['name'] ?? '';
