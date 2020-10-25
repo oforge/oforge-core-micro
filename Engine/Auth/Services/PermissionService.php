@@ -2,7 +2,7 @@
 
 namespace Oforge\Engine\Auth\Services;
 
-use Oforge\Engine\Auth\Controller\SecureController;
+use Oforge\Engine\Auth\Controllers\SecureController;
 
 /**
  * Class Permissions

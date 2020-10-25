@@ -3,7 +3,7 @@
 namespace PHPSTORM_META {
 
     if (function_exists('override')) {
-        override(\Oforge\Engine\Core\Manager\Services\ServiceManager::get(0), map([
+        override(\Oforge\Engine\Core\Managers\Services\ServiceManager::get(0), map([
             'config'             => \Oforge\Engine\Core\Services\ConfigService::class,
             'encryption'         => \Oforge\Engine\Core\Services\EncryptionService::class,
             'endpoint'           => \Oforge\Engine\Core\Services\EndpointService::class,

@@ -9,7 +9,7 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
-use Oforge\Engine\Core\Annotation\Endpoint\AssetBundlesMode;
+use Oforge\Engine\Core\Annotation\Endpoint\AssetBundleMode;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointClass;
 use Oforge\Engine\Core\Helper\FileSystemHelper;
@@ -291,7 +291,7 @@ class EndpointService extends AbstractDatabaseAccess {
         $order      = null;
         $httpMethod = EndpointMethod::ANY;
 
-        $assetBundlesMode   = $classAnnotation->getAssetBundlesMode();
+        $assetBundlesMode   = $classAnnotation->getAssetBundleMode();
         $classAssetBundles  = $classAnnotation->getAssetBundles();
         $methodAssetBundles = null;
 
@@ -306,7 +306,7 @@ class EndpointService extends AbstractDatabaseAccess {
         if (isset($methodAnnotation)) {
             $order              = $methodAnnotation->getOrder();
             $methodAssetBundles = $methodAnnotation->getAssetBundles();
-            $assetBundlesMode   = $methodAnnotation->getAssetBundlesMode() ?? $assetBundlesMode;
+            $assetBundlesMode   = $methodAnnotation->getAssetBundleMode() ?? $assetBundlesMode;
             if (EndpointMethod::isValid($methodAnnotation->getMethod())) {
                 $httpMethod = $methodAnnotation->getMethod();
             }
@@ -326,7 +326,7 @@ class EndpointService extends AbstractDatabaseAccess {
         $path  = StringHelper::leading($path, '/');
         $order = $order ?? $classAnnotation->getOrder() ?? Statics::DEFAULT_ORDER;
 
-        $assetBundlesMode = $assetBundlesMode ?? AssetBundlesMode::OVERRIDE;
+        $assetBundlesMode = $assetBundlesMode ?? AssetBundleMode::OVERRIDE;
         $assetBundles     = $this->prepareEndpointAssetBundles($assetBundlesMode, $classAssetBundles, $methodAssetBundles);
 
         return [
@@ -368,13 +368,13 @@ class EndpointService extends AbstractDatabaseAccess {
         };
 
         switch ($assetBundlesMode) {
-            case AssetBundlesMode::MERGE:
+            case AssetBundleMode::MERGE:
                 $assetBundles = array_unique(array_merge($convert($classAssetBundles), $convert($methodAssetBundles)));
                 break;
-            case AssetBundlesMode::NONE:
+            case AssetBundleMode::NONE:
                 $assetBundles = [];
                 break;
-            case AssetBundlesMode::OVERRIDE:
+            case AssetBundleMode::OVERRIDE:
             default:
                 $assetBundles = $convert($methodAssetBundles);
                 if (empty($assetBundles)) {

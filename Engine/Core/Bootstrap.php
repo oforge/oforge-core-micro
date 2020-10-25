@@ -5,9 +5,6 @@ namespace Oforge\Engine\Core;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
-use Oforge\Engine\Core\Controller\Api\PingController;
-use Oforge\Engine\Core\Controller\Frontend\NotFoundController;
-use Oforge\Engine\Core\Controller\Frontend\ServerErrorController;
 use Oforge\Engine\Core\Models\Config\Config;
 use Oforge\Engine\Core\Models\Config\ConfigType;
 use Oforge\Engine\Core\Models\Config\Value;
@@ -38,9 +35,9 @@ class Bootstrap extends AbstractBootstrap {
 
     public function __construct() {
         $this->endpoints = [
-            PingController::class,
-            NotFoundController::class,
-            ServerErrorController::class,
+            Controllers\Api\PingController::class,
+            Controllers\Frontend\NotFoundController::class,
+            Controllers\Frontend\ServerErrorController::class,
         ];
 
         $this->models = [

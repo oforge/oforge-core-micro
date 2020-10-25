@@ -7,14 +7,14 @@ use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Forge\ForgeDatabase;
 use Oforge\Engine\Core\Forge\ForgeSettings;
 use Oforge\Engine\Core\Forge\ForgeSlimApp;
-use Oforge\Engine\Core\Manager\Bootstrap\BootstrapManager;
-use Oforge\Engine\Core\Manager\Cache\CacheManager;
-use Oforge\Engine\Core\Manager\Events\EventManager;
-use Oforge\Engine\Core\Manager\Logger\LoggerManager;
-use Oforge\Engine\Core\Manager\Modules\ModuleManager;
-use Oforge\Engine\Core\Manager\Plugins\PluginManager;
-use Oforge\Engine\Core\Manager\Services\ServiceManager;
-use Oforge\Engine\Core\Manager\Slim\SlimRouteManager;
+use Oforge\Engine\Core\Managers\Bootstrap\BootstrapManager;
+use Oforge\Engine\Core\Managers\Cache\CacheManager;
+use Oforge\Engine\Core\Managers\Events\EventManager;
+use Oforge\Engine\Core\Managers\Logger\LoggerManager;
+use Oforge\Engine\Core\Managers\Modules\ModuleManager;
+use Oforge\Engine\Core\Managers\Plugins\PluginManager;
+use Oforge\Engine\Core\Managers\Services\ServiceManager;
+use Oforge\Engine\Core\Managers\Slim\SlimRouteManager;
 use Slim\Container;
 use Slim\Exception\MethodNotAllowedException;
 use Slim\Exception\NotFoundException;
@@ -119,7 +119,7 @@ class BlackSmith {
      */
     protected function __construct() {
         Oforge($this);
-        $this->viewManager = \Oforge\Engine\Core\Manager\View\DefaultViewManager::getInstance();
+        $this->viewManager = \Oforge\Engine\Core\Managers\View\DefaultViewManager::getInstance();
     }
 
     /**

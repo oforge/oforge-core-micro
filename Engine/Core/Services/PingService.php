@@ -16,7 +16,7 @@ class PingService {
      *
      * @return string
      */
-    public function me($echo = false) {
+    public function me(bool $echo = false) {
         $text = "Hail to the Oforge King! When you see this, everything looks good";
         if ($echo) {
             echo $text, "\n";

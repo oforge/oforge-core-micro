@@ -25,11 +25,11 @@ class EndpointClass {
      */
     private $assetBundles;
     /**
-     * Mode of how assetsBundles are created for endpoint. AssetBundlesMode::OVERRIDE (default) or AssetBundlesMode::MERGE or AssetBundlesMode::NONE.
+     * Mode of how assetsBundles are created for endpoint. AssetBundleMode::OVERRIDE (default) or AssetBundleMode::MERGE or AssetBundleMode::NONE.
      *
      * @var string|null $assetBundles
      */
-    private $assetBundlesMode = null;
+    private $assetBundleMode = null;
     /**
      * Optional route name prefix (suffixed by Endpoint#name).
      *
@@ -57,8 +57,8 @@ class EndpointClass {
      * @throws AnnotationException
      */
     public function __construct(array $config) {
-        $this->assetBundles     = $config['assetBundles'] ?? null;
-        $this->assetBundlesMode = $config['assetBundlesMode'] ?? null;
+        $this->assetBundles    = $config['assetBundles'] ?? null;
+        $this->assetBundleMode = $config['assetBundlesMode'] ?? null;
 
         $this->name  = $config['name'] ?? '';
         $this->order = $config['order'] ?? null;
@@ -95,8 +95,8 @@ class EndpointClass {
     /**
      * @return string|null
      */
-    public function getAssetBundlesMode() : ?string {
-        return $this->assetBundlesMode;
+    public function getAssetBundleMode() : ?string {
+        return $this->assetBundleMode;
     }
 
     /**

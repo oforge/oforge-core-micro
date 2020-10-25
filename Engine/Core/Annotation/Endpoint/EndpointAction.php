@@ -37,11 +37,11 @@ class EndpointAction {
      */
     private $assetBundles;
     /**
-     * Mode of how assetsBundles are created for endpoint. AssetBundlesMode::OVERRIDE (default) or AssetBundlesMode::MERGE or AssetBundlesMode::NONE.
+     * Mode of how assetsBundles are created for endpoint. AssetBundleMode::OVERRIDE (default) or AssetBundleMode::MERGE or AssetBundleMode::NONE.
      *
      * @var string|null $assetBundles
      */
-    private $assetBundlesMode = null;
+    private $assetBundleMode = null;
     /**
      * Route order for this action, overrides Endpoint#order.
      *
@@ -59,8 +59,8 @@ class EndpointAction {
      * @param array $config
      */
     public function __construct(array $config) {
-        $this->assetBundles     = $config['assetBundles'] ?? null;
-        $this->assetBundlesMode = $config['assetBundlesMode'] ?? null;
+        $this->assetBundles    = $config['assetBundles'] ?? null;
+        $this->assetBundleMode = $config['assetBundlesMode'] ?? null;
 
         $this->method = $config['method'] ?? EndpointMethod::ANY;
         $this->name   = $config['name'] ?? '';
@@ -100,8 +100,8 @@ class EndpointAction {
     /**
      * @return string|null
      */
-    public function getAssetBundlesMode() : ?string {
-        return $this->assetBundlesMode;
+    public function getAssetBundleMode() : ?string {
+        return $this->assetBundleMode;
     }
 
     /**

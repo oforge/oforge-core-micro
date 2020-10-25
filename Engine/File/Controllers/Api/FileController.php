@@ -3,18 +3,18 @@
 namespace Oforge\Engine\File\Controllers\Api;
 
 use Exception;
-use Oforge\Engine\Core\Annotation\Endpoint\AssetBundlesMode;
+use Oforge\Engine\Core\Annotation\Endpoint\AssetBundleMode;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointAction;
 use Oforge\Engine\Core\Annotation\Endpoint\EndpointClass;
-use Oforge\Engine\Core\Controller\Traits\TraitInitializer;
+use Oforge\Engine\Core\Traits\Controller\TraitInitializer;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Helper\ArrayHelper;
 use Oforge\Engine\Core\Helper\ResponseHelper;
 use Oforge\Engine\Core\Models\Endpoint\EndpointMethod;
-use Oforge\Engine\Crud\Controller\Traits\CrudBaseTrait;
-use Oforge\Engine\Crud\Controller\Traits\CrudBundleReadActionsTrait;
-use Oforge\Engine\Crud\Enum\CrudDataAccessLevel;
-use Oforge\Engine\Crud\Enum\CrudDataType;
+use Oforge\Engine\Crud\Traits\Controller\CrudBaseTrait;
+use Oforge\Engine\Crud\Traits\Controller\CrudBundleReadActionsTrait;
+use Oforge\Engine\Crud\Enums\CrudDataAccessLevel;
+use Oforge\Engine\Crud\Enums\CrudDataType;
 use Oforge\Engine\File\Exceptions\FileEntryNotFoundException;
 use Oforge\Engine\File\Exceptions\FileInUsageException;
 use Oforge\Engine\File\Models\File;
@@ -26,14 +26,14 @@ use Slim\Http\Response;
  * Class FileController
  *
  * @package Oforge\Engine\File\Controllers\Api
- * @EndpointClass(path="/api/file", name="api_file", assetBundles=null, assetBundlesMode=AssetBundlesMode::NONE)
+ * @EndpointClass(path="/api/file", name="api_file", assetBundles=null, assetBundlesMode=AssetBundleMode::NONE)
  */
 class FileController {
     use TraitInitializer, CrudBaseTrait, CrudBundleReadActionsTrait;
 
     /** FileController constructor. */
     public function __construct() {
-        [AssetBundlesMode::class, EndpointAction::class, EndpointMethod::class];// Required for imports in nested traits
+        [AssetBundleMode::class, EndpointAction::class, EndpointMethod::class];// Required for imports in nested traits
 
         $this->model = File::class;
 
@@ -83,7 +83,7 @@ class FileController {
      * @param Response $response
      *
      * @return Response
-     * @EndpointAction(path="[/]", method=EndpointMethod::POST, assetBundles="", assetBundlesMode=AssetBundlesMode::NONE)
+     * @EndpointAction(path="[/]", method=EndpointMethod::POST, assetBundles="", assetBundlesMode=AssetBundleMode::NONE)
      */
     public function uploadAction(Request $request, Response $response) {
         /** @var FileManagementService $fileManagementService */
@@ -111,7 +111,7 @@ class FileController {
         foreach ($uploadedFiles as $uploadedFile) {
             try {
                 $file     = $fileManagementService->importUploadedFile($uploadedFile, $options);
-                $result[] = $this->prepareEntityDataArray($file, 'create');
+                $result[] = $this->prepareOutputData($file, 'create');
             } catch (Exception $exception) {
                 $result[] = ['error' => $exception->getMessage()];
             }
@@ -127,7 +127,7 @@ class FileController {
      * @param array $args
      *
      * @return Response
-     * @EndpointAction(path="/{id}", method=EndpointMethod::DELETE, assetBundles="", assetBundlesMode=AssetBundlesMode::NONE)
+     * @EndpointAction(path="/{id}", method=EndpointMethod::DELETE, assetBundles="", assetBundlesMode=AssetBundleMode::NONE)
      */
     public function deleteAction(Request $request, Response $response, array $args) {
         try {
