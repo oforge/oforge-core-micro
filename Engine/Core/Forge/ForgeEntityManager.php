@@ -2,7 +2,6 @@
 
 namespace Oforge\Engine\Core\Forge;
 
-use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NativeQuery;
@@ -10,6 +9,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\Mapping\MappingException;
 
 /**
  * Class ForgeEntityManager
@@ -47,7 +47,7 @@ class ForgeEntityManager {
      * @return ForgeEntityManager
      * @throws ORMException
      */
-    public function create($entity, $flush = true) : ForgeEntityManager {
+    public function create(object $entity, bool $flush = true) : ForgeEntityManager {
         $this->entityManager->persist($entity);
         if ($flush) {
             $this->entityManager->flush($entity);
@@ -65,7 +65,7 @@ class ForgeEntityManager {
      * @return ForgeEntityManager
      * @throws ORMException
      */
-    public function update(&$entity, $flush = true) : ForgeEntityManager {
+    public function update(object &$entity, bool $flush = true) : ForgeEntityManager {
         if (!$this->entityManager->contains($entity)) {
             $entity = $this->entityManager->merge($entity);
         }
@@ -83,7 +83,7 @@ class ForgeEntityManager {
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove($entity, $flush = true) {
+    public function remove(object $entity, bool $flush = true) {
         $this->entityManager->remove($entity);
         if ($flush) {
             $this->entityManager->flush($entity);
@@ -96,7 +96,7 @@ class ForgeEntityManager {
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function flush($entity = null) {
+    public function flush(?object $entity = null) {
         $this->entityManager->flush($entity);
     }
 

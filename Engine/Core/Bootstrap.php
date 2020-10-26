@@ -5,9 +5,6 @@ namespace Oforge\Engine\Core;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
-use Oforge\Engine\Core\Controller\Api\PingController;
-use Oforge\Engine\Core\Controller\Frontend\NotFoundController;
-use Oforge\Engine\Core\Controller\Frontend\ServerErrorController;
 use Oforge\Engine\Core\Models\Config\Config;
 use Oforge\Engine\Core\Models\Config\ConfigType;
 use Oforge\Engine\Core\Models\Config\Value;
@@ -26,7 +23,7 @@ use Oforge\Engine\Core\Services\PingService;
 use Oforge\Engine\Core\Services\PluginAccessService;
 use Oforge\Engine\Core\Services\PluginStateService;
 use Oforge\Engine\Core\Services\RedirectService;
-use Oforge\Engine\Core\Services\Session\SessionManagementService;
+use Oforge\Engine\Core\Services\Session\SessionService;
 use Oforge\Engine\Core\Services\TokenService;
 
 /**
@@ -38,9 +35,9 @@ class Bootstrap extends AbstractBootstrap {
 
     public function __construct() {
         $this->endpoints = [
-            PingController::class,
-            NotFoundController::class,
-            ServerErrorController::class,
+            Controllers\Api\PingController::class,
+            Controllers\Frontend\NotFoundController::class,
+            Controllers\Frontend\ServerErrorController::class,
         ];
 
         $this->models = [
@@ -55,17 +52,17 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->services = [
-            'config'             => ConfigService::class,
-            'encryption'         => EncryptionService::class,
-            'endpoint'           => EndpointService::class,
-            'middleware'         => MiddlewareService::class,
-            'ping'               => PingService::class,
-            'plugin.access'      => PluginAccessService::class,
-            'plugin.state'       => PluginStateService::class,
-            'redirect'           => RedirectService::class,
-            'session.management' => SessionManagementService::class,
-            'store.keyvalue'     => KeyValueStoreService::class,
-            'token'              => TokenService::class,
+            'config'         => ConfigService::class,
+            'encryption'     => EncryptionService::class,
+            'endpoint'       => EndpointService::class,
+            'middleware'     => MiddlewareService::class,
+            'ping'           => PingService::class,
+            'plugin.access'  => PluginAccessService::class,
+            'plugin.state'   => PluginStateService::class,
+            'redirect'       => RedirectService::class,
+            'session'        => SessionService::class,
+            'store.keyvalue' => KeyValueStoreService::class,
+            'token'          => TokenService::class,
         ];
 
         $this->order = 0;
@@ -147,7 +144,7 @@ class Bootstrap extends AbstractBootstrap {
             'name'     => 'system_format_datetime',
             'type'     => ConfigType::STRING,
             'group'    => 'date_format',
-            'default'  => 'd.m.Y H:i:s',
+            'default'  => 'Y-m-d H:i:s',
             'label'    => 'config_system_format_datetime',
             'required' => true,
         ]);
@@ -155,7 +152,7 @@ class Bootstrap extends AbstractBootstrap {
             'name'     => 'system_format_date',
             'type'     => ConfigType::STRING,
             'group'    => 'date_format',
-            'default'  => 'd.m.Y',
+            'default'  => 'Y-m-d',
             'label'    => 'config_system_format_date',
             'required' => true,
         ]);

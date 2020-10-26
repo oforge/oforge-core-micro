@@ -6,8 +6,8 @@ namespace PHPSTORM_META {
         /**
          * Services
          */
-        override(\Oforge\Engine\Core\Manager\Services\ServiceManager::get(0), map([
-            'crud' => \Oforge\Engine\Crud\Service\GenericCrudService::class,
+        override(\Oforge\Engine\Core\Managers\Services\ServiceManager::get(0), map([
+            'crud' => \Oforge\Engine\Crud\Services\GenericCrudService::class,
         ]));
     }
 

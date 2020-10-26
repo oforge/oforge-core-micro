@@ -10,7 +10,7 @@ use Oforge\Engine\Core\Helper\FileHelper;
 use Oforge\Engine\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Core\Helper\Statics;
 use Oforge\Engine\Core\Helper\StringHelper;
-use Oforge\Engine\Core\Manager\Events\Event;
+use Oforge\Engine\Core\Managers\Events\Event;
 use Oforge\Engine\File\Enums\FileTypeGroup;
 use Oforge\Engine\File\Exceptions\FileEntryNotFoundException;
 use Oforge\Engine\File\Exceptions\FileImportException;

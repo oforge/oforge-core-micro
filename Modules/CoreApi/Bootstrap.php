@@ -16,7 +16,7 @@ class Bootstrap extends AbstractBootstrap {
      */
     public function __construct() {
         $this->endpoints = [
-            Controller\Api\KeyValueController::class,
+            Controllers\Api\KeyValueController::class,
         ];
     }
 

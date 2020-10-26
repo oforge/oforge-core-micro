@@ -15,9 +15,9 @@ class Bootstrap extends AbstractBootstrap {
 
     /** Bootstrap constructor. */
     public function __construct() {
-        // $this->endpoints = [
-        //     Controllers\Api\FileController::class,
-        // ];
+        $this->endpoints = [
+            Controllers\Api\FileController::class,
+        ];
 
         $this->services = [
             'file.access'     => Services\FileAccessService::class,

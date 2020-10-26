@@ -7,14 +7,15 @@ use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Forge\ForgeDatabase;
 use Oforge\Engine\Core\Forge\ForgeSettings;
 use Oforge\Engine\Core\Forge\ForgeSlimApp;
-use Oforge\Engine\Core\Manager\Bootstrap\BootstrapManager;
-use Oforge\Engine\Core\Manager\Cache\CacheManager;
-use Oforge\Engine\Core\Manager\Events\EventManager;
-use Oforge\Engine\Core\Manager\Logger\LoggerManager;
-use Oforge\Engine\Core\Manager\Modules\ModuleManager;
-use Oforge\Engine\Core\Manager\Plugins\PluginManager;
-use Oforge\Engine\Core\Manager\Services\ServiceManager;
-use Oforge\Engine\Core\Manager\Slim\SlimRouteManager;
+use Oforge\Engine\Core\Managers\Bootstrap\BootstrapManager;
+use Oforge\Engine\Core\Managers\Cache\CacheManager;
+use Oforge\Engine\Core\Managers\Events\EventManager;
+use Oforge\Engine\Core\Managers\Logger\LoggerManager;
+use Oforge\Engine\Core\Managers\Modules\ModuleManager;
+use Oforge\Engine\Core\Managers\Plugins\PluginManager;
+use Oforge\Engine\Core\Managers\Services\ServiceManager;
+use Oforge\Engine\Core\Managers\Slim\SlimRouteManager;
+use Oforge\Engine\Core\Services\Session\SessionService;
 use Slim\Container;
 use Slim\Exception\MethodNotAllowedException;
 use Slim\Exception\NotFoundException;
@@ -32,23 +33,11 @@ class BlackSmith {
      * @var BlackSmith
      */
     protected static $instance = null;
-    /**
-     * BootstrapManager
-     *
-     * @var BootstrapManager $bootstrapManager
-     */
+    /** @var BootstrapManager $bootstrapManager */
     private $bootstrapManager = null;
-    /**
-     * Container
-     *
-     * @var Container $container
-     */
+    /** @var Container $container Container */
     private $container = null;
-    /**
-     *  DataBase
-     *
-     * @var ForgeDatabase $db
-     */
+    /** @var ForgeDatabase $db DataBase */
     private $db = null;
     /** @var EventManager $eventManager */
     private $eventManager = null;
@@ -119,7 +108,7 @@ class BlackSmith {
      */
     protected function __construct() {
         Oforge($this);
-        $this->viewManager = \Oforge\Engine\Core\Manager\View\DefaultViewManager::getInstance();
+        $this->viewManager = \Oforge\Engine\Core\Managers\View\DefaultViewManager::getInstance();
     }
 
     /**
@@ -297,10 +286,6 @@ class BlackSmith {
         $this->forgeSlimApp = ForgeSlimApp::getInstance();
         $this->container    = $this->App()->getContainer();
 
-        if ($start) {
-            $this->forgeSlimApp->sessionStart();
-        }
-
         // Init modules and plugins
         $this->bootstrapManager = BootstrapManager::getInstance();
         $this->bootstrapManager->init();
@@ -308,6 +293,12 @@ class BlackSmith {
         // Init and load modules
         $this->moduleManager = ModuleManager::getInstance();
         $this->moduleManager->init();
+
+        if ($start) {
+            /** @var SessionService $sessionService */
+            $sessionService = Oforge()->Services()->get('session');
+            $sessionService->start();
+        }
 
         // Init and load plugins
         $this->pluginManager = PluginManager::getInstance();

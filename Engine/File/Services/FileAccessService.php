@@ -3,7 +3,7 @@
 namespace Oforge\Engine\File\Services;
 
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
-use Oforge\Engine\Crud\Service\GenericCrudService;
+use Oforge\Engine\Crud\Services\GenericCrudService;
 use Oforge\Engine\File\Models\File;
 
 /**

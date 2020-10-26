@@ -4,7 +4,7 @@ namespace Oforge\Engine\Crud;
 
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Core\Exceptions\LoggerAlreadyExistException;
-use Oforge\Engine\Crud\Service\GenericCrudService;
+use Oforge\Engine\Crud\Services\GenericCrudService;
 
 /**
  * Class Bootstrap

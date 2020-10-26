@@ -5,7 +5,7 @@ namespace Oforge\Engine\File\Services;
 use Doctrine\ORM\ORMException;
 use Exception;
 use InvalidArgumentException;
-use Oforge\Engine\Cache\Helper\Cache;
+use Oforge\Engine\Cache\Managers\CacheManager;
 use Oforge\Engine\Cache\Lib\ArrayCache;
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Core\Exceptions\ConfigOptionKeyNotExistException;
@@ -26,7 +26,7 @@ class AllowedFileMimeTypeService extends AbstractDatabaseAccess {
     /** AllowedFileMimeTypeService constructor. */
     public function __construct() {
         parent::__construct(FileMimeType::class);
-        $this->cache = Cache::initArrayCache();
+        $this->cache = CacheManager::initArrayCache();
     }
 
     /**

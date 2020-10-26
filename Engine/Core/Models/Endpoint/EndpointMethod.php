@@ -5,7 +5,7 @@ namespace Oforge\Engine\Core\Models\Endpoint;
 /**
  * Class EndpointMethod
  *
- * @package Oforge\Engine\Core\Annotation\Endpoint
+ * @package Oforge\Engine\Core\Models\Endpoint
  */
 class EndpointMethod {
     public const ANY     = 'any';
