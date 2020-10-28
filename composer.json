@@ -11,7 +11,6 @@
         "php-di/slim-bridge": "^2.0",
         "doctrine/orm":"^2.0",
         "firebase/php-jwt": "^5.0",
-        "ulrichsg/getopt-php": "^3.0",
         "marcj/topsort": "^1.1",
         "ext-fileinfo": "*",
         "wikimedia/composer-merge-plugin": "*"
