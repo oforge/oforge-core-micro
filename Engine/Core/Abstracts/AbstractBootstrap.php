@@ -13,10 +13,6 @@ use Oforge\Engine\Core\Helper\Statics;
  */
 abstract class AbstractBootstrap {
     /**
-     * @var string[] $commands
-     */
-    protected $commands = [];
-    /**
      * @var string[] $cronjobs
      */
     protected $cronjobs = [];
@@ -72,13 +68,6 @@ abstract class AbstractBootstrap {
 
     /** @throws Exception */
     public function load() {
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getCommands() {
-        return $this->commands;
     }
 
     /**

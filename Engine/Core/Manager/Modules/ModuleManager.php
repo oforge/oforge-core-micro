@@ -15,6 +15,7 @@ use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Forge\ForgeEntityManager;
 use Oforge\Engine\Core\Helper\Helper;
 use Oforge\Engine\Core\Helper\Statics;
+use Oforge\Engine\Core\Manager\Events\Event;
 use Oforge\Engine\Core\Models\Module\Module;
 use Oforge\Engine\Core\Services\MiddlewareService;
 
@@ -86,11 +87,9 @@ class ModuleManager
         $bucket = [];
         // add all modules except of the core bootstrap file
         foreach ($modules as $module) {
-            /**
-             * @var $module Module
-             */
+            /** @var Module $module */
             $classname = $module->getName();
-            $instance = new $classname();
+            $instance = Oforge()->getBootstrapManager()->getBootstrapInstance($classname);
             if (get_class($instance) != Bootstrap::class) {
                 array_push($bucket, $instance);
             }
@@ -159,10 +158,8 @@ class ModuleManager
     protected function register($className)
     {
         if (is_subclass_of($className, AbstractBootstrap::class)) {
-            /**
-             * @var $instance AbstractBootstrap
-             */
-            $instance = new $className();
+            /** @var AbstractBootstrap $instance */
+            $instance = Oforge()->getBootstrapManager()->getBootstrapInstance($className);
 
             $moduleEntry = $this->moduleRepository()->findBy(["name" => get_class($instance)]);
             if (isset($moduleEntry) && sizeof($moduleEntry) > 0) {
@@ -188,11 +185,9 @@ class ModuleManager
     protected function initModule($className)
     {
         if (is_subclass_of($className, AbstractBootstrap::class)) {
-            /**
-             * @var $instance AbstractBootstrap
-             */
-            $instance = new $className();
-
+            /** @var AbstractBootstrap $instance */
+            $instance = Oforge()->getBootstrapManager()->getBootstrapInstance($className);
+            Oforge()->Events()->trigger(Event::create('Oforge:Extension:init', ['bootstrap' => $instance]));
             Oforge()->DB()->initModelSchema($instance->getModels());
 
             $services = $instance->getServices();
@@ -243,11 +238,9 @@ class ModuleManager
         $startTime = microtime(true) * 1000;
 
         if (is_subclass_of($className, AbstractBootstrap::class)) {
-            /**
-             * @var $instance AbstractBootstrap
-             */
-            $instance = new $className();
-
+            /** @var AbstractBootstrap $instance */
+            $instance = Oforge()->getBootstrapManager()->getBootstrapInstance($className);
+            Oforge()->Events()->trigger(Event::create('Oforge:Extension:init', ['bootstrap' => $instance]));
             Oforge()->DB()->initModelSchema($instance->getModels());
 
             $services = $instance->getServices();

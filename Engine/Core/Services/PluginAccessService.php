@@ -29,7 +29,7 @@ class PluginAccessService extends AbstractDatabaseAccess {
 
         foreach ($plugins as $plugin) {
             $classname    = $plugin->getName() . "\\Bootstrap";
-            $instance     = new $classname();
+            $instance     = Oforge()->getBootstrapManager()->getBootstrapInstance($classname);
             $dependencies = array_map(function ($val) {
                 return explode('\\', $val)[0];
             }, $instance->getDependencies());

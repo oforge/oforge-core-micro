@@ -72,7 +72,7 @@ class Helper {
         $className = $pluginName . "\\Bootstrap";
 
         if (is_subclass_of($className, AbstractBootstrap::class)) {
-            return new $className();
+            return Oforge()->getBootstrapManager()->getBootstrapInstance($className);
         }
         throw new InvalidClassException($className, AbstractBootstrap::class);
     }
