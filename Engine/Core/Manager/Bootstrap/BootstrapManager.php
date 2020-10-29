@@ -17,7 +17,7 @@ use Oforge\Engine\TemplateEngine\Core\Abstracts\AbstractTemplate;
  */
 class BootstrapManager
 {
-    private const FILE_PATH = ROOT_PATH . Statics::DIR_CACHE . Statics::GLOBAL_SEPARATOR . 'bootstrap.php';
+    private const FILE_PATH = ROOT_PATH . Statics::DIR_CACHE . Statics::GLOBAL_SEPARATOR . 'bootstrap.cache.php';
     public const  KEY_PATH = 'path';
     public const  KEY_NS = 'namespace';
     /** @var BootstrapManager $instance */
@@ -87,15 +87,6 @@ class BootstrapManager
         return $this->bootstrapData[Statics::PLUGIN_DIR];
     }
 
-    /**
-     * Returns theme bootstrap data.
-     *
-     * @return mixed
-     */
-    public function getThemeBootstrapData()
-    {
-        return $this->bootstrapData[Statics::TEMPLATE_DIR];
-    }
 
     /**
      * Initialize all modules and plugins bootstrap data.
@@ -168,7 +159,6 @@ class BootstrapManager
         $bootstrapData = [
             Statics::ENGINE_DIR => $this->collectBootstrapDataSub(Statics::ENGINE_DIR),
             Statics::PLUGIN_DIR => $this->collectBootstrapDataSub(Statics::PLUGIN_DIR),
-            Statics::TEMPLATE_DIR => $this->collectBootstrapDataSub(Statics::TEMPLATE_DIR),
         ];
 
         $this->bootstrapData = $bootstrapData;
@@ -185,24 +175,17 @@ class BootstrapManager
     {
         $isModule = $context === Statics::ENGINE_DIR;
         $isPlugin = $context === Statics::PLUGIN_DIR;
-        $isTheme = $context === Statics::TEMPLATE_DIR;
         $data = [];
-        if ($isTheme) {
-            $files = FileSystemHelper::getThemeBootstrapFiles(ROOT_PATH . Statics::GLOBAL_SEPARATOR . $context);
-        } else {
-            $files = FileSystemHelper::getBootstrapFiles(ROOT_PATH . Statics::GLOBAL_SEPARATOR . $context);
-        }
+        $files = FileSystemHelper::getBootstrapFiles(ROOT_PATH . Statics::GLOBAL_SEPARATOR . $context);
         foreach ($files as $file) {
             $directory = dirname($file);
 
-            $class = str_replace('/', '\\', str_replace(ROOT_PATH, '', $directory)) . ($isTheme ? '\Template' : '\Bootstrap');
+            $class = str_replace('/', '\\', str_replace(ROOT_PATH, '', $directory)) . '\Bootstrap';
 
             $class = 'Oforge'.$class;
 
             if ($isModule || $isPlugin) {
                 $namespace = StringHelper::rightTrim($class, '\\Bootstrap');
-            } elseif ($isTheme) {
-                $namespace = StringHelper::rightTrim($class, '\\Template');
             }
             $class = StringHelper::leftTrim($class, '\\');
 
