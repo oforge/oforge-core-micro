@@ -55,7 +55,7 @@ abstract class AbstractBatchCallCommand extends AbstractCommand {
      */
     protected function execute(InputInterface $input, OutputInterface $output) : int {
         $this->checkBatchCallConfig();
-        $stopOnError = $this->getDefinition()->hasOption(self::OPTION_STOP_ON_ERROR) && $input->hasOption(self::OPTION_STOP_ON_ERROR);
+        $stopOnError = $input->getOption(self::OPTION_STOP_ON_ERROR);
         foreach ($this->commands as $name => $args) {
             if (!is_string($name)) {
                 $name = $args;

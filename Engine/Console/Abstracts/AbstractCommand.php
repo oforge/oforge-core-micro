@@ -46,6 +46,7 @@ abstract class AbstractCommand extends Command {
      * @var array $config
      */
     protected $config = [];
+    private $logger = null;
 
     /** @inheritdoc */
     protected function configure() {
@@ -84,10 +85,10 @@ abstract class AbstractCommand extends Command {
             }
             if (isset($config['options']) && is_array($config['options'])) {
                 foreach ($config['options'] as $optionName => $optionConfig) {
-                    $shortcut    = $argumentConfig['shortcut'] ?? null;
-                    $mode        = $argumentConfig['mode'] ?? InputOption::VALUE_NONE;
-                    $description = $argumentConfig['description'] ?? '';
-                    $default     = $argumentConfig['default'] ?? null;
+                    $shortcut    = $optionConfig['shortcut'] ?? null;
+                    $mode        = $optionConfig['mode'] ?? InputOption::VALUE_NONE;
+                    $description = $optionConfig['description'] ?? '';
+                    $default     = $optionConfig['default'] ?? null;
                     if ($mode === InputOption::VALUE_NONE) {
                         $default = null;
                     }
@@ -115,5 +116,17 @@ abstract class AbstractCommand extends Command {
 
         return $command->run($args, $output);
     }
+
+    // protected function getLogger(OutputInterface $output) { //not working yet, TODO howto combine of $output & logger
+    //     if ($this->logger === null) {
+    //         // $consoleLogger = new ConsoleLogger($output);
+    //         //
+    //         // $consoleLogger->
+    //         //
+    //         // $this->logger = $consoleLogger;
+    //     }
+    //
+    //     return $this->logger;
+    // }
 
 }

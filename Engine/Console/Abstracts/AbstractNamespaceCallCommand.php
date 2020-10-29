@@ -26,7 +26,7 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
      *
      * @var string[] $excludeCommands
      */
-    protected $excludeCommands;
+    protected $excludeCommands = [];
 
     /**
      * AbstractNamespaceCallCommand constructor.
@@ -44,7 +44,7 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
     /** @inheritdoc */
     protected function configure() {
         $this->addOption(self::OPTION_STOP_ON_ERROR, null, InputOption::VALUE_NONE, 'Quit when a subcommand fails.');
-        $this->setDescription('Call all commands of namespace: ' . $this->namespace);
+        $this->setDescription('Call all commands of namespace: "' . $this->namespace . '"');
         parent::configure();
     }
 
@@ -54,7 +54,7 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
      */
     protected function execute(InputInterface $input, OutputInterface $output) : int {
         $this->checNamespaceCallConfig();
-        $stopOnError = $this->getDefinition()->hasOption(self::OPTION_STOP_ON_ERROR) && $input->hasOption(self::OPTION_STOP_ON_ERROR);
+        $stopOnError = $input->getOption(self::OPTION_STOP_ON_ERROR);
         $commands    = $this->getApplication()->all($this->namespace);
         if (!is_array($commands)) {
             $commands = [$commands];
