@@ -3,6 +3,7 @@
 namespace Oforge\Engine\Console\Abstracts;
 
 use Exception;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,7 +45,7 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
     /** @inheritdoc */
     protected function configure() {
         $this->addOption(self::OPTION_STOP_ON_ERROR, null, InputOption::VALUE_NONE, 'Quit when a subcommand fails.');
-        $this->setDescription('Call all commands of namespace: "' . $this->namespace . '"');
+        $this->setDescription("Call all commands of namespace: '{$this->namespace}'");
         parent::configure();
     }
 
@@ -75,7 +76,7 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
 
     private function checNamespaceCallConfig() {
         if (empty($this->namespace)) {
-            //TODO
+            throw new RuntimeException("Property 'namespace' not defined.");
         }
     }
 }

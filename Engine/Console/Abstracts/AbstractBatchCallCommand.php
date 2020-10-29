@@ -3,6 +3,7 @@
 namespace Oforge\Engine\Console\Abstracts;
 
 use Exception;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -64,6 +65,9 @@ abstract class AbstractBatchCallCommand extends AbstractCommand {
             if ($this->getName() === $name) {
                 continue;
             }
+            if (is_string($args) && method_exists($this, $args)) {
+                $args = $this->$args();
+            }
             $errorCode = $this->callOtherCommand($output, $name, $args);
             if ($errorCode === self::FAILURE && $stopOnError) {
                 return self::FAILURE;
@@ -75,10 +79,10 @@ abstract class AbstractBatchCallCommand extends AbstractCommand {
 
     private function checkBatchCallConfig() {
         if (!isset($this->commands)) {
-            //TODO
+            throw new RuntimeException("Property 'commands' not defined.");
         }
         if (empty($this->commands)) {
-            //TODO
+            throw new RuntimeException("Property 'commands' is empty.");
         }
         foreach ($this->commands as $name => $args) {
             if (!is_string($name)) {
@@ -86,10 +90,13 @@ abstract class AbstractBatchCallCommand extends AbstractCommand {
                 $args = [];
             }
             if (!is_string($name)) {
-                //TODO
+                throw new RuntimeException("Command name '$name' is not a string.");
+            }
+            if ($args === null) {
+                throw new RuntimeException("Arguments of command '$name' is null.");
             }
             if (!(is_string($args) || is_array($args))) {
-                //TODO
+                throw new RuntimeException("Arguments of command '$name' is not a string or array.");
             }
         }
     }
