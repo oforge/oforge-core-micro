@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Console\Commands\Core;
+namespace Oforge\Engine\Console\Commands\Oforge;
 
 use Oforge\Engine\Console\Abstracts\AbstractCommand;
 use Oforge\Engine\Core\Services\PingService;

@@ -9,7 +9,7 @@ use Oforge\Engine\Console\Abstracts\AbstractBatchCallCommand;
  *
  * @package Oforge\Engine\Console\Commands\Example
  */
-class ExampleBatchCallCommand extends AbstractBatchCallCommand {
+class BatchCallCommand extends AbstractBatchCallCommand {
     /** @var string $defaultName */
     protected static $defaultName = 'example:batch';
     /** @var array $commands */

@@ -7,15 +7,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class ExampleCommand1
+ * Class ExampleCommand3
  *
  * @package Oforge\Engine\Console\Commands\Example
  */
-class ExampleCommand1 extends AbstractCommand {
+class Command3 extends AbstractCommand {
     /** @var string[] $config */
     protected $config = [
-        'name'        => 'example:cmd1',
-        'description' => 'Example command 1',
+        'name'        => 'example:cmd3',
+        'description' => 'Example command 3',
     ];
 
     /** @inheritdoc */

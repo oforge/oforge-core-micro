@@ -18,13 +18,19 @@ class Bootstrap extends AbstractBootstrap {
      */
     public function __construct() {
         $this->setConfiguration('commands', [
-            Commands\Core\PingCommand::class,
-            Commands\Core\ProcessAsyncEventsCommand::class,
-            Commands\Example\ExampleBatchCallCommand::class,
-            Commands\Example\ExampleCommand1::class,
-            Commands\Example\ExampleCommand2::class,
-            Commands\Example\ExampleCommand3::class,
-            Commands\Example\ExampleNamespaceCallCommand::class,
+            Commands\Oforge\PingCommand::class,
+            Commands\Oforge\ProcessAsyncEventsCommand::class,
+            Commands\Oforge\ServiceCommand::class,
+            Commands\Cleanup\LogFilesCommand::class,
+            Commands\Cleanup\Cache\BootstrapCommand::class,
+            Commands\Cleanup\Cache\DoctrineProxyCommand::class,
+            Commands\Cleanup\Cache\NamespaceCallCommand::class,
+            Commands\Dev\Cleanup\Cache\DoctrineCommand::class,
+            Commands\Example\BatchCallCommand::class,
+            Commands\Example\Command1::class,
+            Commands\Example\Command2::class,
+            Commands\Example\Command3::class,
+            Commands\Example\NamespaceCallCommand::class,
         ]);
 
         Oforge()->Events()->attach('Oforge:Extension:init', Event::SYNC, function(Event $event) {
