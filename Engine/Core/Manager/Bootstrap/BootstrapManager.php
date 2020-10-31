@@ -109,15 +109,11 @@ class BootstrapManager {
         foreach ($this->bootstrapData as $type => $data) {
             foreach ($data as $bootstrapClass => $bootstrapData) {
                 if (is_subclass_of($bootstrapClass, AbstractBootstrap::class)) {
-                    echo "1: ";
-                    var_dump($bootstrapClass);
-                    $instance = $bootstrapClass::getInstance();
                     /** @var AbstractBootstrap $instance */
+                    $instance = $bootstrapClass::getInstance();
                     if ($bootstrapClass === CoreBootstrap::class) {
                         Oforge()->DB()->initModelSchema($instance->getModels());
                     }
-                    echo "3: ";
-                    var_dump(get_class($instance));
                     $this->bootstrapInstances[$bootstrapClass] = $instance;
                 }
             }
