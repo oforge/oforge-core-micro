@@ -14,7 +14,8 @@ use Oforge\Engine\Core\Services\ConfigService;
 class Bootstrap extends AbstractBootstrap {
 
     /** Bootstrap constructor. */
-    public function __construct() {
+    protected function __construct() {
+        parent::__construct();
         // $this->endpoints = [
         //     Controllers\Api\FileController::class,
         // ];

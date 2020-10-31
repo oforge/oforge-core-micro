@@ -8,18 +8,16 @@ use Oforge\Engine\Core\Helper\ArrayPhpFileStorage;
 use Oforge\Engine\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Core\Helper\Statics;
 use Oforge\Engine\Core\Helper\StringHelper;
-use Oforge\Engine\TemplateEngine\Core\Abstracts\AbstractTemplate;
 
 /**
  * Class BootstrapManager
  *
  * @package Oforge\Engine\Core\Manager\BootstrapManager
  */
-class BootstrapManager
-{
+class BootstrapManager {
     private const FILE_PATH = ROOT_PATH . Statics::DIR_CACHE . Statics::GLOBAL_SEPARATOR . 'bootstrap.cache.php';
-    public const  KEY_PATH = 'path';
-    public const  KEY_NS = 'namespace';
+    public const  KEY_PATH  = 'path';
+    public const  KEY_NS    = 'namespace';
     /** @var BootstrapManager $instance */
     protected static $instance = null;
     /** @var array $bootstrapData */
@@ -27,15 +25,13 @@ class BootstrapManager
     /** @var array $bootstrapInstances s */
     private $bootstrapInstances = [];
 
-    protected function __construct()
-    {
+    protected function __construct() {
     }
 
     /**
      * @return BootstrapManager
      */
-    public static function getInstance(): BootstrapManager
-    {
+    public static function getInstance() : BootstrapManager {
         if (is_null(self::$instance)) {
             self::$instance = new BootstrapManager();
         }
@@ -48,8 +44,7 @@ class BootstrapManager
      *
      * @return AbstractBootstrap|null
      */
-    public function getBootstrapInstance(string $class): ?AbstractBootstrap
-    {
+    public function getBootstrapInstance(string $class) : ?AbstractBootstrap {
         if (isset($this->bootstrapInstances[$class])) {
             return $this->bootstrapInstances[$class];
         }
@@ -62,8 +57,7 @@ class BootstrapManager
      *
      * @return array
      */
-    public function getBootstrapInstances(): array
-    {
+    public function getBootstrapInstances() : array {
         return $this->bootstrapInstances;
     }
 
@@ -72,8 +66,7 @@ class BootstrapManager
      *
      * @return mixed
      */
-    public function getModuleBootstrapData()
-    {
+    public function getModuleBootstrapData() {
         return $this->bootstrapData[Statics::ENGINE_DIR];
     }
 
@@ -82,17 +75,14 @@ class BootstrapManager
      *
      * @return mixed
      */
-    public function getPluginBootstrapData()
-    {
+    public function getPluginBootstrapData() {
         return $this->bootstrapData[Statics::PLUGIN_DIR];
     }
-
 
     /**
      * Initialize all modules and plugins bootstrap data.
      */
-    public function init()
-    {
+    public function init() {
         $isDevelopmentMode = Oforge()->Settings()->isDevelopmentMode();
         if ($isDevelopmentMode) {
             $this->collectBootstrapData();
@@ -119,16 +109,15 @@ class BootstrapManager
         foreach ($this->bootstrapData as $type => $data) {
             foreach ($data as $bootstrapClass => $bootstrapData) {
                 if (is_subclass_of($bootstrapClass, AbstractBootstrap::class)) {
+                    echo "1: ";
+                    var_dump($bootstrapClass);
+                    $instance = $bootstrapClass::getInstance();
                     /** @var AbstractBootstrap $instance */
-                    $instance = new $bootstrapClass();
                     if ($bootstrapClass === CoreBootstrap::class) {
                         Oforge()->DB()->initModelSchema($instance->getModels());
                     }
-                    $this->bootstrapInstances[$bootstrapClass] = $instance;
-                } elseif (is_subclass_of($bootstrapClass, AbstractTemplate::class)) {
-                    /** @var AbstractTemplate $instance */
-                    $instance = new $bootstrapClass();
-
+                    echo "3: ";
+                    var_dump(get_class($instance));
                     $this->bootstrapInstances[$bootstrapClass] = $instance;
                 }
             }
@@ -138,8 +127,7 @@ class BootstrapManager
     /**
      * Create parent folder if not exist and updates Bootstrap-data file.
      */
-    public function updateBootstrapData()
-    {
+    public function updateBootstrapData() {
         $this->collectBootstrapData();
 
         if (!file_exists($dir = dirname(self::FILE_PATH))) {
@@ -154,8 +142,7 @@ class BootstrapManager
     /**
      * Collect and set all Bootstrap-data of modules and plugins.
      */
-    protected function collectBootstrapData()
-    {
+    protected function collectBootstrapData() {
         $bootstrapData = [
             Statics::ENGINE_DIR => $this->collectBootstrapDataSub(Statics::ENGINE_DIR),
             Statics::PLUGIN_DIR => $this->collectBootstrapDataSub(Statics::PLUGIN_DIR),
@@ -171,26 +158,22 @@ class BootstrapManager
      *
      * @return array
      */
-    protected function collectBootstrapDataSub(string $context)
-    {
+    protected function collectBootstrapDataSub(string $context) {
         $isModule = $context === Statics::ENGINE_DIR;
-        $isPlugin = $context === Statics::PLUGIN_DIR;
-        $data = [];
-        $files = FileSystemHelper::getBootstrapFiles(ROOT_PATH . Statics::GLOBAL_SEPARATOR . $context);
+        $data     = [];
+        $files    = FileSystemHelper::getBootstrapFiles(ROOT_PATH . Statics::GLOBAL_SEPARATOR . $context);
         foreach ($files as $file) {
             $directory = dirname($file);
 
             $class = str_replace('/', '\\', str_replace(ROOT_PATH, '', $directory)) . '\Bootstrap';
 
-            $class = 'Oforge'.$class;
+            $class = 'Oforge' . $class;
 
-            if ($isModule || $isPlugin) {
-                $namespace = StringHelper::rightTrim($class, '\\Bootstrap');
-            }
-            $class = StringHelper::leftTrim($class, '\\');
+            $namespace = StringHelper::rightTrim($class, '\\Bootstrap');
+            $class     = StringHelper::leftTrim($class, '\\');
 
             $data[$class] = [
-                self::KEY_NS => $namespace,
+                self::KEY_NS   => $namespace,
                 self::KEY_PATH => $directory,
             ];
         }

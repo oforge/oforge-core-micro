@@ -16,7 +16,8 @@ class Bootstrap extends AbstractBootstrap {
     /**
      * Console-Bootstrap constructor.
      */
-    public function __construct() {
+    protected function __construct() {
+        parent::__construct();
         $this->setConfiguration('commands', [
             Commands\Oforge\PingCommand::class,
             Commands\Oforge\ProcessAsyncEventsCommand::class,

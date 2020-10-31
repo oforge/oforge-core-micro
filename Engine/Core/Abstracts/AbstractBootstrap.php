@@ -4,6 +4,7 @@ namespace Oforge\Engine\Core\Abstracts;
 
 use Exception;
 use Oforge\Engine\Core\Helper\Statics;
+use Oforge\Engine\Core\Traits\SingletonTrait;
 
 /**
  * Class AbstractBootstrap
@@ -12,6 +13,10 @@ use Oforge\Engine\Core\Helper\Statics;
  * @package Oforge\Engine\Core\Abstracts
  */
 abstract class AbstractBootstrap {
+    use SingletonTrait;
+
+    /** @var static $instance */
+    protected static $instance = null;
     /**
      * @var string[] $cronjobs
      */
@@ -42,6 +47,12 @@ abstract class AbstractBootstrap {
     protected $order = Statics::DEFAULT_ORDER;
     /** @var array $configuration */
     private $configuration = [];
+
+    /**
+     * AbstractBootstrap constructor.
+     */
+    protected function __construct() {
+    }
 
     /** @throws Exception */
     public function install() {
