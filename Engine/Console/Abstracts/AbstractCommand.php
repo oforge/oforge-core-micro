@@ -3,6 +3,12 @@
 namespace Oforge\Engine\Console\Abstracts;
 
 use Exception;
+use Monolog\Logger;
+use Oforge\Engine\Console\Lib\ConsoleFormatter;
+use Oforge\Engine\Console\Lib\MonologBridge\ConsoleHandler;
+use Oforge\Engine\Core\Exceptions\LoggerAlreadyExistException;
+use Oforge\Engine\Core\Helper\Statics;
+use Oforge\Engine\Core\Manager\Logger\LoggerManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -46,6 +52,7 @@ abstract class AbstractCommand extends Command {
      * @var array $config
      */
     protected $config = [];
+    /** @var Logger|null $logger */
     private $logger = null;
 
     /** @inheritdoc */
@@ -117,16 +124,34 @@ abstract class AbstractCommand extends Command {
         return $command->run($args, $output);
     }
 
-    // protected function getLogger(OutputInterface $output) { //not working yet, TODO howto combine of $output & logger
-    //     if ($this->logger === null) {
-    //         // $consoleLogger = new ConsoleLogger($output);
-    //         //
-    //         // $consoleLogger->
-    //         //
-    //         // $this->logger = $consoleLogger;
-    //     }
-    //
-    //     return $this->logger;
-    // }
+    /**
+     * @param OutputInterface $output
+     *
+     * @return Logger|null
+     */
+    protected function getLogger(OutputInterface $output) {
+        if ($this->logger === null) {
+            $consoleFormatter = new ConsoleFormatter();
+            try {
+                $logger = Oforge()->Logger()->initLogger('Console:' . $this->getName(), [
+                    'path' => implode(Statics::GLOBAL_SEPARATOR, [
+                        ROOT_PATH . Statics::DIR_LOG,
+                        'command',
+                        str_replace(':', '.', $this->getName()) . LoggerManager::FILE_EXTENSION,
+                    ]),
+                ]);
+                foreach ($logger->getHandlers() as $handler) {
+                    $handler->setFormatter($consoleFormatter);
+                }
+            } catch (LoggerAlreadyExistException $exception) {
+                $logger = Oforge()->Logger()->get('Console:' . $this->getName());
+            }
+            $consoleHandler   = new ConsoleHandler($output);
+            $logger->pushHandler($consoleHandler->setFormatter($consoleFormatter));
+            $this->logger = $logger;
+        }
+
+        return $this->logger;
+    }
 
 }
