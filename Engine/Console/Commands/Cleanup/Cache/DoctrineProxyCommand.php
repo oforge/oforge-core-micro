@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class DoctrineProxyCommand
  *
- * @package Oforge\Engine\Console\Commands\Cleanup
+ * @package Oforge\Engine\Console\Commands\Cleanup\Cache
  */
 class DoctrineProxyCommand extends AbstractCommand {
     /** @var string[] $config */

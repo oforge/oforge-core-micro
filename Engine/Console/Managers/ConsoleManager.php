@@ -2,6 +2,7 @@
 
 namespace Oforge\Engine\Console\Managers;
 
+use Exception;
 use Oforge\Engine\Core\Exceptions\InvalidClassException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -65,7 +66,7 @@ class ConsoleManager {
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function run() {
         $output = $this->application->run(null, $this->output);
@@ -77,7 +78,7 @@ class ConsoleManager {
      * @param bool $consoleOutput
      *
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function callCommand(string $name, $args, bool $consoleOutput = true) {
         $command = $this->application->find($name);

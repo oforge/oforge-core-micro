@@ -8,6 +8,7 @@ use Oforge\Engine\Core\Helper\ArrayPhpFileStorage;
 use Oforge\Engine\Core\Helper\FileSystemHelper;
 use Oforge\Engine\Core\Helper\Statics;
 use Oforge\Engine\Core\Helper\StringHelper;
+use Oforge\Engine\Core\Traits\SingletonTrait;
 
 /**
  * Class BootstrapManager
@@ -15,28 +16,17 @@ use Oforge\Engine\Core\Helper\StringHelper;
  * @package Oforge\Engine\Core\Manager\BootstrapManager
  */
 class BootstrapManager {
+    use SingletonTrait;
+
     private const FILE_PATH = ROOT_PATH . Statics::DIR_CACHE . Statics::GLOBAL_SEPARATOR . 'bootstrap.cache.php';
     public const  KEY_PATH  = 'path';
     public const  KEY_NS    = 'namespace';
-    /** @var BootstrapManager $instance */
-    protected static $instance = null;
     /** @var array $bootstrapData */
     private $bootstrapData = [];
     /** @var array $bootstrapInstances s */
     private $bootstrapInstances = [];
 
     protected function __construct() {
-    }
-
-    /**
-     * @return BootstrapManager
-     */
-    public static function getInstance() : BootstrapManager {
-        if (is_null(self::$instance)) {
-            self::$instance = new BootstrapManager();
-        }
-
-        return self::$instance;
     }
 
     /**
@@ -161,9 +151,7 @@ class BootstrapManager {
         foreach ($files as $file) {
             $directory = dirname($file);
 
-            $class = str_replace('/', '\\', str_replace(ROOT_PATH, '', $directory)) . '\Bootstrap';
-
-            $class = 'Oforge' . $class;
+            $class = 'Oforge' . str_replace('/', '\\', str_replace(ROOT_PATH, '', $directory)) . '\Bootstrap';
 
             $namespace = StringHelper::rightTrim($class, '\\Bootstrap');
             $class     = StringHelper::leftTrim($class, '\\');
@@ -173,7 +161,7 @@ class BootstrapManager {
                 self::KEY_PATH => $directory,
             ];
         }
-        if ($isModule) {
+        if ($isModule && isset($data[CoreBootstrap::class])) {
             // set CoreBootstrap as first entry
             $tmp = $data[CoreBootstrap::class];
             unset($data[CoreBootstrap::class]);

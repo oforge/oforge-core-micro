@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class DoctrineCommand
  *
- * @package Oforge\Engine\Console\Commands\Dev\Cleanup
+ * @package Oforge\Engine\Console\Commands\Dev\Cleanup\Cache
  */
 class DoctrineCommand extends AbstractCommand {
     /** @var string[] $config */

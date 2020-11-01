@@ -4,7 +4,7 @@ namespace Oforge\Engine\Core\Abstracts;
 
 use Exception;
 use Oforge\Engine\Core\Helper\Statics;
-use Oforge\Engine\Core\Traits\SingletonTrait;
+use Oforge\Engine\Core\Traits\AbstractClassSingletonTrait;
 
 /**
  * Class AbstractBootstrap
@@ -13,7 +13,7 @@ use Oforge\Engine\Core\Traits\SingletonTrait;
  * @package Oforge\Engine\Core\Abstracts
  */
 abstract class AbstractBootstrap {
-    use SingletonTrait;
+    use AbstractClassSingletonTrait;
 
     /** @var static $instance */
     protected static $instance = null;

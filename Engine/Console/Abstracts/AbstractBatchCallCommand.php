@@ -37,6 +37,7 @@ abstract class AbstractBatchCallCommand extends AbstractCommand {
      *
      * @param string|null $name
      * @param array $commands
+     * @throws RuntimeException
      */
     public function __construct(string $name = null, array $commands = []) {
         $this->commands = $this->commands ?? $commands;
@@ -52,6 +53,7 @@ abstract class AbstractBatchCallCommand extends AbstractCommand {
 
     /**
      * @inheritDoc
+     * @throws RuntimeException
      * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output) : int {
@@ -77,6 +79,11 @@ abstract class AbstractBatchCallCommand extends AbstractCommand {
         return self::SUCCESS;
     }
 
+    /**
+     * Validate command config
+     *
+     * @throws RuntimeException
+     */
     private function checkBatchCallConfig() {
         if (!isset($this->commands)) {
             throw new RuntimeException("Property 'commands' not defined.");

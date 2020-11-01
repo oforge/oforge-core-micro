@@ -34,7 +34,8 @@ class Bootstrap extends AbstractBootstrap {
             Commands\Example\NamespaceCallCommand::class,
         ]);
 
-        Oforge()->Events()->attach('Oforge:Extension:init', Event::SYNC, function(Event $event) {
+        // TODO after core refactoring: attach only if extension active
+        Oforge()->Events()->attach('Oforge:Extension:init', Event::SYNC, function (Event $event) {
             /** @var AbstractBootstrap $boostrap */
             $boostrap = $event->getDataValue('bootstrap');
             ConsoleManager::registerCommandClasses($boostrap->getConfiguration('commands'));

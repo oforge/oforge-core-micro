@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class PingCommand
  *
- * @package Oforge\Engine\Console\Commands\Core
+ * @package Oforge\Engine\Console\Commands\Oforge
  */
 class PingCommand extends AbstractCommand {
     /** @var string[] $config */

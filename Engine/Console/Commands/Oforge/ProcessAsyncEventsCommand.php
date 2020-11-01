@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class ProcessAsyncEventsCommand
  *
- * @package Oforge\Engine\Console\Commands\Core
+ * @package Oforge\Engine\Console\Commands\Oforge
  */
 class ProcessAsyncEventsCommand extends AbstractCommand {
     /** @var array $config */
@@ -26,4 +26,5 @@ class ProcessAsyncEventsCommand extends AbstractCommand {
 
         return self::SUCCESS;
     }
+
 }

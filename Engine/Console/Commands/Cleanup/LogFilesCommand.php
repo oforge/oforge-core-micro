@@ -39,4 +39,5 @@ class LogFilesCommand extends AbstractCommand {
 
         return self::SUCCESS;
     }
+
 }

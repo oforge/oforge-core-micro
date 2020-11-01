@@ -3,13 +3,13 @@
 namespace Oforge\Engine\Core\Traits;
 
 /**
- * Trait SingletonTrait.
+ * Singleton trait classes.
  *
  * @package Oforge\Engine\Core\Traits
  */
 trait SingletonTrait {
     /** @var static $instance */
-    private static $instances = [];
+    private static $instance;
 
     /**
      * Get or create and get singleton instance.
@@ -18,11 +18,11 @@ trait SingletonTrait {
      */
     public static function getInstance() {
         $class = get_called_class();
-        if (!isset(self::$instances[$class])) {
-            self::$instances[$class] = new $class();
+        if (!isset(self::$instance)) {
+            self::$instance = new $class();
         }
 
-        return self::$instances[$class];
+        return self::$instance;
     }
 
 }

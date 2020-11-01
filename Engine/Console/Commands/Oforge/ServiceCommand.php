@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class ServiceCommand
  *
- * @package Oforge\Engine\Console\Commands\Core
+ * @package Oforge\Engine\Console\Commands\Oforge
  */
 class ServiceCommand extends AbstractCommand {
     /** @var array $config */

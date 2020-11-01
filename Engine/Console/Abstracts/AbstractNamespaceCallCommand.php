@@ -34,11 +34,12 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
      *
      * @param string|null $namespace
      * @param array $excludeCommands
+     * @throws RuntimeException
      */
     public function __construct(string $namespace = null, array $excludeCommands = []) {
         $this->namespace       = rtrim($this->namespace ?? trim($namespace), ':');
         $this->excludeCommands = $this->excludeCommands ?? (empty($excludeCommands) ? null : $excludeCommands);
-        $this->checNamespaceCallConfig();
+        $this->checkNamespaceCallConfig();
         parent::__construct(static::$defaultName ?? $this->namespace);
     }
 
@@ -51,10 +52,11 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
 
     /**
      * @inheritDoc
+     * @throws RuntimeException
      * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output) : int {
-        $this->checNamespaceCallConfig();
+        $this->checkNamespaceCallConfig();
         $stopOnError = $input->getOption(self::OPTION_STOP_ON_ERROR);
         $commands    = $this->getApplication()->all($this->namespace);
         if (!is_array($commands)) {
@@ -74,9 +76,15 @@ abstract class AbstractNamespaceCallCommand extends AbstractCommand {
         return self::SUCCESS;
     }
 
-    private function checNamespaceCallConfig() {
+    /**
+     * Validate command config
+     *
+     * @throws RuntimeException
+     */
+    private function checkNamespaceCallConfig() {
         if (empty($this->namespace)) {
             throw new RuntimeException("Property 'namespace' not defined.");
         }
     }
+
 }
