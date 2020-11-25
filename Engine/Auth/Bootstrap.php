@@ -33,7 +33,7 @@ class Bootstrap extends AbstractBootstrap {
             'auth.password'  => Services\PasswordService::class,
             'auth.role'      => Services\RoleService::class,
             'auth.user'      => Services\UserService::class,
-            'auth.user_role' => Services\UserRoleService::class,
+            'auth.user.role' => Services\UserRoleService::class,
             // 'auth'          => AuthService::class,
             // 'permissions'   => PermissionService::class,
         ];

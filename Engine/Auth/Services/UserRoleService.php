@@ -124,11 +124,18 @@ class UserRoleService extends AbstractDatabaseAccess {
      * @throws ORMException
      */
     protected function detach(array $roleIds, array $userIds) {
+        $criteria = [];
+        if (!empty($roleIds)) {
+            $criteria['roleId'] = $roleIds;
+        }
+        if (!empty($userIds)) {
+            $criteria['userId'] = $userIds;
+        }
+        if (empty($criteria)) {
+            return;
+        }
         /** @var UserRole[] $entities */
-        $entities = $this->repository()->findBy([
-            'roleId' => $roleIds,
-            'userId' => $userIds,
-        ]);
+        $entities = $this->repository()->findBy($criteria);
         foreach ($entities as $entity) {
             $this->entityManager()->remove($entity, false);
         }

@@ -8,7 +8,7 @@ namespace PHPSTORM_META {
             'auth.password'  => \Oforge\Engine\Auth\Services\PasswordService::class,
             'auth.role'      => \Oforge\Engine\Auth\Services\RoleService::class,
             'auth.user'      => \Oforge\Engine\Auth\Services\UserService::class,
-            'auth.user_role' => \Oforge\Engine\Auth\Services\UserRoleService::class,
+            'auth.user.role' => \Oforge\Engine\Auth\Services\UserRoleService::class,
             // 'auth'          => \Oforge\Engine\Auth\Services\AuthService::class,
             // 'permissions'   => \Oforge\Engine\Auth\Services\PermissionService::class,
         ]));
