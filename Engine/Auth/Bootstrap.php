@@ -2,12 +2,6 @@
 
 namespace Oforge\Engine\Auth;
 
-use Oforge\Engine\Auth\Models\User\User;
-use Oforge\Engine\Auth\Services\AuthService;
-use Oforge\Engine\Auth\Services\BackendLoginService;
-use Oforge\Engine\Auth\Services\PasswordService;
-use Oforge\Engine\Auth\Services\PermissionService;
-use Oforge\Engine\Auth\Services\UserService;
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Core\Models\Config\ConfigType;
 use Oforge\Engine\Core\Services\ConfigService;
@@ -23,30 +17,39 @@ class Bootstrap extends AbstractBootstrap {
      * Bootstrap constructor.
      */
     public function __construct() {
+        $this->middlewares = [// Middlewares\SecureEndpointMiddleware::class
+        ];
+
         $this->models = [
-            User::class,
+            // Models\Permission::class,
+            Models\Role::class,
+            // Models\RolePermission::class,
+            Models\User::class,
+            // Models\UserPermission::class,
+            Models\UserRole::class,
         ];
 
         $this->services = [
-            'auth'          => AuthService::class,
-            'backend.login' => BackendLoginService::class,
-            'password'      => PasswordService::class,
-            'permissions'   => PermissionService::class,
-            'user'          => UserService::class
+            'auth.password'  => Services\PasswordService::class,
+            'auth.role'      => Services\RoleService::class,
+            'auth.user'      => Services\UserService::class,
+            'auth.user_role' => Services\UserRoleService::class,
+            // 'auth'          => AuthService::class,
+            // 'permissions'   => PermissionService::class,
         ];
     }
 
+    /** @inheritdoc */
     public function install() {
         parent::install();
-
         /** @var ConfigService $configService */
         $configService = Oforge()->Services()->get('config');
         $configService->add([
-            'name'     => 'auth_core_password_min_length',
+            'name'     => 'auth_password_min_length',
             'type'     => ConfigType::INTEGER,
-            'group'    => 'auth_core',
+            'group'    => 'auth',
             'default'  => 6,
-            'label'    => 'config_auth_core_password_min_length',
+            'label'    => 'config_auth_password_min_length',
             'required' => true,
         ]);
     }

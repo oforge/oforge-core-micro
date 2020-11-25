@@ -1,43 +1,70 @@
 <?php
 
-
 namespace Oforge\Engine\Auth\Services;
 
+use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\ORMException;
 use Exception;
-use Oforge\Engine\Auth\Enums\InvalidPasswordFormatException;
-use Oforge\Engine\Auth\Models\User\User;
+use Oforge\Engine\Auth\Exceptions\InvalidPasswordFormatException;
+use Oforge\Engine\Auth\Exceptions\PasswordGeneratorException;
+use Oforge\Engine\Auth\Exceptions\User\UserAlreadyExistException;
+use Oforge\Engine\Auth\Models\User;
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
-use Oforge\Engine\Core\Helper\ArrayHelper;
+use Oforge\Engine\Core\Manager\Events\Event;
 
 /**
  * Class UserService
  *
- * @package Oforge\Engine\Modules\UserManagement\Services
+ * @package Oforge\Engine\Auth\Services
  */
 class UserService extends AbstractDatabaseAccess {
 
+    /** UserService constructor. */
     public function __construct() {
-        parent::__construct([
-            'User' => User::class,
-        ]);
+        parent::__construct(User::class);
     }
 
     /**
-     * Create backend user.
+     * @param int $userId
+     * @param bool $active
      *
+     * @throws EntityNotFoundException
+     * @throws ORMException
+     */
+    public function changeActivationById(int $userId, bool $active) : void {
+        $this->changeActivation($this->getById($userId), $active, 'id', $userId);
+    }
+
+    /**
+     * @param string $login User login.
+     * @param bool $active
+     *
+     * @throws EntityNotFoundException
+     * @throws ORMException
+     */
+    public function changeActivationByLogin(string $login, bool $active) : void {
+        $this->changeActivation($this->getByLogin($login), $active, 'login', $login);
+    }
+
+    /**
+     * Create user.
+     *
+     * @param string $login
      * @param string $email
      * @param string|null $password
-     * @param int $role
      *
-     * @return string
-     * @throws Exception
+     * @return array
+     * @throws UserAlreadyExistException
+     * @throws PasswordGeneratorException
+     * @throws InvalidPasswordFormatException
+     * @throws ORMException
      */
-    public function createUser(string $email, ?string $password = null, int $role = User::ROLE_ADMINISTRATOR) {
-        if ($this->repository('User')->count(['email' => $email]) > 0) {
-            return "User  with email '$email' already exists.";
+    public function create(string $login, string $email, ?string $password = null) : array {
+        if ($this->existLogin($login)) {
+            throw new UserAlreadyExistException($login);
         }
-
-        $passwordService = new PasswordService();
+        /** @var PasswordService $passwordService */
+        $passwordService = Oforge()->Services()->get('auth.password');
         if ($password === null) {
             try {
                 $password = $passwordService->generatePassword();
@@ -45,30 +72,122 @@ class UserService extends AbstractDatabaseAccess {
                 Oforge()->Logger()->logException($exception);
                 throw $exception;
             }
-        } else {
-            try {
-                $passwordService->validateFormat($password);
-            } catch (InvalidPasswordFormatException $exception) {
-                return 'Password format is not valid: ' . $exception->getMessage();
-            }
         }
+        $passwordService->validateFormat($password);
         $passwordHash = $passwordService->hash($password);
 
-        $User = User::create([
-            'email'    => $email,
-            'role'     => $role,
+        $user = User::create([
+            'login'    => $login,
             'password' => $passwordHash,
+            'email'    => $email,
             'active'   => true,
         ]);
-        $this->entityManager()->create($User);
+        $this->entityManager()->create($user);
+        $userData = $user->toArray();
+        Oforge()->Events()->trigger(Event::create(User::class . '::created', $userData));
 
-        $role = ArrayHelper::get([
-            User::ROLE_SYSTEM        => 'system',
-            User::ROLE_ADMINISTRATOR => 'admin',
-            User::ROLE_MODERATOR     => 'moderator',
-        ], $role, $role);
+        return $userData;
+    }
 
-        return "User ($role) created with email '$email' and password: " . $password;
+    /**
+     * Check if login already exist and optional if from other user.
+     *
+     * @param string $login
+     * @param int|null $userId
+     *
+     * @return bool
+     */
+    public function existLogin(string $login, ?int $userId = null) : bool {
+        $user = $this->getByLogin($login);
+        if ($user === null) {
+            return false;
+        }
+
+        return $userId === null ? true : ($userId !== $user->getId());
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return User|null
+     */
+    public function getById(int $userId) : ?User {
+        return $this->getOneBy(['id' => $userId]);
+    }
+
+    /**
+     * @param string $login
+     *
+     * @return User|null
+     */
+    public function getByLogin(string $login) : ?User {
+        return $this->getOneBy(['login' => $login]);
+    }
+
+    /**
+     * @param array $criteria
+     *
+     * @return User|null
+     */
+    public function getOneBy(array $criteria) : ?User {
+        /** @var User|null $entity */
+        $entity = $this->repository()->findOneBy($criteria);
+
+        return $entity;
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @throws EntityNotFoundException
+     * @throws ORMException
+     */
+    public function removeById(int $userId) : void {
+        $this->remove($this->getById($userId), 'id', $userId);
+    }
+
+    /**
+     * @param string $login User login.
+     *
+     * @throws EntityNotFoundException
+     * @throws ORMException
+     */
+    public function removeByLogin(string $login) : void {
+        $this->remove($this->getByLogin($login), 'login', $login);
+    }
+
+    /**
+     * @param User|null $user
+     * @param bool $active
+     * @param string $key
+     * @param int|string $value
+     *
+     * @throws EntityNotFoundException
+     * @throws ORMException
+     */
+    protected function changeActivation(?User $user, bool $active, string $key, $value) : void {
+        if ($user === null) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier(User::class, [$key => $value]);
+        }
+        $user->setActive($active);
+        $this->entityManager()->update($user);
+    }
+
+    /**
+     * @param User|null $user
+     * @param string $key
+     * @param int|string $value
+     *
+     * @throws EntityNotFoundException
+     * @throws ORMException
+     */
+    protected function remove(?User $user, string $key, $value) : void {
+        if ($user === null) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier(User::class, [$key => $value]);
+        }
+        $userData = $user->toArray();
+        $this->entityManager()->remove($user);
+        Oforge()->Events()->trigger(Event::create(User::class . '::removed', $userData));
     }
 
 }

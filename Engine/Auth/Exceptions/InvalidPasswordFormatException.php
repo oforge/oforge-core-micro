@@ -1,13 +1,13 @@
 <?php
 
-namespace Oforge\Engine\Auth\Enums;
+namespace Oforge\Engine\Auth\Exceptions;
 
 use Exception;
 
 /**
  * Class InvalidPasswordFormatException
  *
- * @package Oforge\Engine\Auth\Enums
+ * @package Oforge\Engine\Auth\Exceptions
  */
 class InvalidPasswordFormatException extends Exception {
 

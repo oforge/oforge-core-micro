@@ -1,0 +1,77 @@
+<?php
+
+namespace Oforge\Engine\Auth\Commands;
+
+use Doctrine\ORM\ORMException;
+use Oforge\Engine\Auth\Exceptions\InvalidPasswordFormatException;
+use Oforge\Engine\Auth\Exceptions\PasswordGeneratorException;
+use Oforge\Engine\Auth\Exceptions\User\UserAlreadyExistException;
+use Oforge\Engine\Auth\Services\UserService;
+use Oforge\Engine\Console\Abstracts\AbstractCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+/**
+ * Class UserCreateCommand
+ *
+ * @package Oforge\Engine\Auth\Commands
+ */
+class UserCreateCommand extends AbstractCommand {
+    /** @var string[] $config */
+    protected $config = [
+        'name'        => 'oforge:user:create',
+        'description' => 'Create new user',
+        'arguments'   => [
+            'login'    => [
+                'mode'        => InputArgument::REQUIRED,
+                'description' => 'Unique login (required)',
+            ],
+            'email'    => [
+                'mode'        => InputArgument::REQUIRED,
+                'description' => 'Mail address (required)',
+            ],
+            'password' => [
+                'mode'        => InputArgument::OPTIONAL,
+                'description' => 'If password is not given, one is generated.',
+            ],
+        ],
+    ];
+
+    protected function execute(InputInterface $input, OutputInterface $output) {
+        $login    = $input->getArgument('login');
+        $email    = $input->getArgument('email');
+        $password = $input->getArgument('password');
+        if (empty($login) || empty($email)) {
+            $command = $this->getApplication()->find('help');
+            if ($command !== null) {
+                $command->execute(new ArrayInput([
+                    $this::getName(),
+                ]), $output);
+            }
+
+            return;
+        }
+        if (empty($password)) {
+            $password = null;
+        }
+        /** @var UserService $userService */
+        $userService = Oforge()->Services()->get('auth.user');
+
+        try {
+            $userData = $userService->create($login, $email, $password);
+            $output->writeln('User created:');
+            foreach ($userData as $key => $value) {
+                $output->writeln("\t$key: $value");
+            }
+
+            return self::SUCCESS;
+        } catch (UserAlreadyExistException | PasswordGeneratorException | InvalidPasswordFormatException | ORMException $exception) {
+            $output->writeln($exception->getMessage());
+
+            return self::FAILURE;
+        }
+    }
+
+}
