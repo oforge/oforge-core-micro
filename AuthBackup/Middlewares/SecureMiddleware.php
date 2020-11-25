@@ -1,6 +1,6 @@
 <?php
 
-namespace Oforge\Engine\Auth\Middleware;
+namespace Oforge\Engine\Auth\Middlewares;
 
 use Oforge\Engine\Auth\Controller\SecureController;
 use Oforge\Engine\Auth\Models\User\User;
