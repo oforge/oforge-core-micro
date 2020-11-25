@@ -23,7 +23,7 @@ return [
         'cache_dir'     => ROOT_PATH . Statics::DIR_CACHE_DB,
         // you should add any other path containing annotated entity classes
         'metadata_dirs' => [ROOT_PATH . '/Engine', ROOT_PATH . '/Plugins'],
-        'connection' => [
+        'connection'    => [
             'driver'   => 'pdo_mysql',
             'host'     => 'localhost',
             'port'     => 3306,
@@ -33,7 +33,11 @@ return [
             'charset'  => 'utf8mb4' // we expect to use utf8 charset everywhere (webserver, mysql, php, etc)
         ],
     ],
-    'jwt_salt'          => 'my awesome salt', // Change this salt for security
+    // Change this salts for security
+    'salts'             => [
+        'jwt'      => 'my awesome salt',
+        'password' => 'my awesome salt',
+    ],
     // config for db value encrypt/decrypt
     'encryption'        => [
         // 'method' => 'aes-128-gcm', // Default: aes-128-gcm
@@ -55,6 +59,5 @@ return [
         ],
     ],
     // plugin configs
-    'plugins' => [
-    ],
+    'plugins'           => [],
 ];

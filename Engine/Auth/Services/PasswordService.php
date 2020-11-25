@@ -13,6 +13,8 @@ use Oforge\Engine\Core\Services\ConfigService;
  * @package Oforge\Engine\Auth\Services
  */
 class PasswordService {
+    /** @var string|null $salt */
+    private $salt = null;
 
     /**
      * @param string $password
@@ -103,9 +105,11 @@ class PasswordService {
      * @return string
      */
     protected function getSalted(string $password) : string {
-        $salt = Oforge()->Settings()->get('salts.password', '');
+        if (!isset($this->salt)) {
+            $this->salt = Oforge()->Settings()->get('salts.password', '');
+        }
 
-        return $salt . $password;
+        return $this->salt . $password;
     }
 
 }
