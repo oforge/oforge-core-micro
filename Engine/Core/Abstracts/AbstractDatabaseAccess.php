@@ -12,6 +12,7 @@ use Oforge\Engine\Core\Forge\ForgeEntityManager;
  * @package Oforge\Engine\Core\Abstracts
  */
 abstract class AbstractDatabaseAccess {
+    protected const REPOSITORY_DEFAULT = 'default';
     /** @var ForgeEntityManager $forgeEntityManger */
     private $forgeEntityManger;
     /** @var array $repositories */
@@ -25,7 +26,7 @@ abstract class AbstractDatabaseAccess {
      * @param string|array $models
      */
     public function __construct($models) {
-        $this->models = is_string($models) ? ['default' => $models] : $models;
+        $this->models = is_string($models) ? [self::REPOSITORY_DEFAULT => $models] : $models;
     }
 
     /** @return ForgeEntityManager */
@@ -53,7 +54,7 @@ abstract class AbstractDatabaseAccess {
      *
      * @return EntityRepository
      */
-    protected function repository(string $name = 'default') : EntityRepository {
+    protected function repository(string $name = self::REPOSITORY_DEFAULT) : EntityRepository {
         if (!isset($this->repositories[$name])) {
             $this->repositories[$name] = $this->entityManager()->getRepository($this->models[$name]);
         }
