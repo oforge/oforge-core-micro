@@ -31,8 +31,8 @@ class UserService extends AbstractDatabaseAccess {
      * @throws EntityNotFoundException
      * @throws ORMException
      */
-    public function changeActivationById(int $userId, bool $active) : void {
-        $this->changeActivation($this->getById($userId), $active, 'id', $userId);
+    public function setActivationById(int $userId, bool $active) : void {
+        $this->setActivation($this->getById($userId), $active, 'id', $userId);
     }
 
     /**
@@ -42,8 +42,8 @@ class UserService extends AbstractDatabaseAccess {
      * @throws EntityNotFoundException
      * @throws ORMException
      */
-    public function changeActivationByLogin(string $login, bool $active) : void {
-        $this->changeActivation($this->getByLogin($login), $active, 'login', $login);
+    public function setActivationByLogin(string $login, bool $active) : void {
+        $this->setActivation($this->getByLogin($login), $active, 'login', $login);
     }
 
     /**
@@ -165,7 +165,7 @@ class UserService extends AbstractDatabaseAccess {
      * @throws EntityNotFoundException
      * @throws ORMException
      */
-    protected function changeActivation(?User $user, bool $active, string $key, $value) : void {
+    protected function setActivation(?User $user, bool $active, string $key, $value) : void {
         if ($user === null) {
             throw EntityNotFoundException::fromClassNameAndIdentifier(User::class, [$key => $value]);
         }

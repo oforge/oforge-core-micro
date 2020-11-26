@@ -21,21 +21,23 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->models = [
-            // Models\Permission::class,
+            Models\Permission::class,
             Models\Role::class,
-            // Models\RolePermission::class,
+            Models\RolePermission::class,
             Models\User::class,
-            // Models\UserPermission::class,
+            Models\UserPermission::class,
             Models\UserRole::class,
         ];
 
         $this->services = [
-            'auth.password'  => Services\PasswordService::class,
-            'auth.role'      => Services\RoleService::class,
-            'auth.user'      => Services\UserService::class,
-            'auth.user.role' => Services\UserRoleService::class,
+            'auth.password'        => Services\PasswordService::class,
+            'auth.role'            => Services\RoleService::class,
+            'auth.role.permission' => Services\RolePermissionService::class,
+            'auth.user'            => Services\UserService::class,
+            'auth.user.permission' => Services\UserPermissionService::class,
+            'auth.user.role'       => Services\UserRoleService::class,
+            'auth.permission'      => Services\PermissionService::class,
             // 'auth'          => AuthService::class,
-            // 'permissions'   => PermissionService::class,
         ];
     }
 

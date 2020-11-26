@@ -55,8 +55,8 @@ class RoleService extends AbstractDatabaseAccess {
      * @throws EntityNotFoundException
      * @throws ORMException
      */
-    public function changeActivationById(int $roleId, bool $active) : void {
-        $this->changeActivation($this->getById($roleId), $active, 'id', $roleId);
+    public function setActivationById(int $roleId, bool $active) : void {
+        $this->setActivation($this->getById($roleId), $active, 'id', $roleId);
     }
 
     /**
@@ -66,8 +66,8 @@ class RoleService extends AbstractDatabaseAccess {
      * @throws EntityNotFoundException
      * @throws ORMException
      */
-    public function changeActivationByName(int $name, bool $active) : void {
-        $this->changeActivation($this->getByName($name), $active, 'name', $name);
+    public function setActivationByName(int $name, bool $active) : void {
+        $this->setActivation($this->getByName($name), $active, 'name', $name);
     }
 
     /**
@@ -129,7 +129,7 @@ class RoleService extends AbstractDatabaseAccess {
      * @throws EntityNotFoundException
      * @throws ORMException
      */
-    protected function changeActivation(?Role $role, bool $active, string $key, $value) {
+    protected function setActivation(?Role $role, bool $active, string $key, $value) {
         if ($role === null) {
             throw EntityNotFoundException::fromClassNameAndIdentifier(Role::class, [$key => $value]);
         }

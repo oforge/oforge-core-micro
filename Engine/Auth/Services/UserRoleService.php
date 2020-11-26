@@ -20,9 +20,9 @@ class UserRoleService extends AbstractDatabaseAccess {
     /** UserRoleService constructor. */
     public function __construct() {
         parent::__construct([
-            'default' => UserRole::class,
-            'role'    => Role::class,
-            'user'    => User::class,
+            Role::class     => Role::class,
+            User::class     => User::class,
+            UserRole::class => UserRole::class,
         ]);
     }
 
@@ -83,8 +83,8 @@ class UserRoleService extends AbstractDatabaseAccess {
          * @var User[] $users
          * @var Role[] $roles
          */
-        $roles      = $this->repository('role')->findBy(['id' => $roleIds]);
-        $users      = $this->repository('user')->findBy(['id' => $userIds]);
+        $roles      = $this->repository(Role::class)->findBy(['id' => $roleIds]);
+        $users      = $this->repository(User::class)->findBy(['id' => $userIds]);
         $mapRoleIds = array_flip($roleIds);
         foreach ($roles as $role) {
             unset($mapRoleIds[$role->getId()]);
@@ -107,7 +107,7 @@ class UserRoleService extends AbstractDatabaseAccess {
                     'roleId' => $role->getId(),
                     'userId' => $user->getId(),
                 ];
-                $entity = $this->repository()->findOneBy($data);
+                $entity = $this->repository(UserRole::class)->findOneBy($data);
                 if ($entity === null) {
                     $entity = UserRole::create($data);
                     $this->entityManager()->create($entity, false);
@@ -135,7 +135,7 @@ class UserRoleService extends AbstractDatabaseAccess {
             return;
         }
         /** @var UserRole[] $entities */
-        $entities = $this->repository()->findBy($criteria);
+        $entities = $this->repository(UserRole::class)->findBy($criteria);
         foreach ($entities as $entity) {
             $this->entityManager()->remove($entity, false);
         }
