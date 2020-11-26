@@ -3,7 +3,9 @@
 namespace Oforge\Engine\Core\Abstracts;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\ORMException;
 use Oforge\Engine\Core\Forge\ForgeEntityManager;
+use Oforge\Engine\Core\Manager\Events\Event;
 
 /**
  * Class AbstractModel
@@ -46,20 +48,43 @@ abstract class AbstractDatabaseAccess {
      * @return EntityRepository
      */
     protected function getRepository(string $class) : EntityRepository {
-        return $this->entityManager()->getRepository($class);
+        if (!isset($this->repositories[$class])) {
+            $this->repositories[$class] = $this->entityManager()->getRepository($class);
+        }
+
+        return $this->repositories[$class];
     }
 
     /**
      * @param string $name
      *
-     * @return EntityRepository
+     * @return EntityRepository|null
      */
-    protected function repository(string $name = self::REPOSITORY_DEFAULT) : EntityRepository {
-        if (!isset($this->repositories[$name])) {
-            $this->repositories[$name] = $this->entityManager()->getRepository($this->models[$name]);
-        }
+    protected function repository(string $name = self::REPOSITORY_DEFAULT) : ?EntityRepository {
+        return isset($this->models[$name]) ? $this->getRepository($this->models[$name]) : null;
+    }
 
-        return $this->repositories[$name];
+    /**
+     * @param string $name
+     * @param array $criteria
+     *
+     * @throws ORMException
+     */
+    protected function removeEntities(string $name, array $criteria) {
+        /** @var AbstractClassPropertyAccess[] $entities */
+        $entityClass = $this->models[$name];
+        $entities    = $this->repository($name)->findBy($criteria);
+        if (!empty($entities)) {
+            $dataEntities = [];
+            foreach ($entities as $entity) {
+                $dataEntities[] = $entity->toArray();
+                $this->entityManager()->remove($entity, false);
+            }
+            $this->entityManager()->flush();
+            foreach ($dataEntities as $dataEntity) {
+                Oforge()->Events()->trigger(Event::create($entityClass . '::removed', $dataEntity));
+            }
+        }
     }
 
 }
