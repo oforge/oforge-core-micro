@@ -4,6 +4,7 @@ namespace Oforge\Engine\Console\Abstracts;
 
 use Exception;
 use Monolog\Logger;
+use Oforge\Engine\Console\Helper\ConsoleHelper;
 use Oforge\Engine\Console\Lib\ConsoleFormatter;
 use Oforge\Engine\Console\Lib\MonologBridge\ConsoleHandler;
 use Oforge\Engine\Core\Exceptions\LoggerAlreadyExistException;
@@ -12,6 +13,7 @@ use Oforge\Engine\Core\Manager\Logger\LoggerManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -106,6 +108,19 @@ abstract class AbstractCommand extends Command {
     }
 
     /**
+     * Printing command help. execute-Usage:
+     *      return $this->printHelpForThisCommand($input, $output);
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return int
+     */
+    protected function printHelpForThisCommand(InputInterface $input, OutputInterface $output) {
+        return ConsoleHelper::printCommandHelp($this, $input, $output);
+    }
+
+    /**
      * @param OutputInterface $output
      * @param string $name
      * @param string|array $args
@@ -146,7 +161,7 @@ abstract class AbstractCommand extends Command {
             } catch (LoggerAlreadyExistException $exception) {
                 $logger = Oforge()->Logger()->get('Console:' . $this->getName());
             }
-            $consoleHandler   = new ConsoleHandler($output);
+            $consoleHandler = new ConsoleHandler($output);
             $logger->pushHandler($consoleHandler->setFormatter($consoleFormatter));
             $this->logger = $logger;
         }
