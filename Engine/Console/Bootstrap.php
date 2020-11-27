@@ -2,22 +2,9 @@
 
 namespace Oforge\Engine\Console;
 
-use Oforge\Engine\Console\Commands\Cleanup\CleanupLogfilesCommand;
-use Oforge\Engine\Console\Commands\Console\CommandListCommand;
-use Oforge\Engine\Console\Commands\Core\PingCommand;
-use Oforge\Engine\Console\Commands\Core\ProcessAsyncEventsCommand;
-use Oforge\Engine\Console\Commands\Dev\DevCleanupBatchCommand;
-use Oforge\Engine\Console\Commands\Dev\DevDoctrineOrmCacheCleanupCommand;
-use Oforge\Engine\Console\Commands\Doctrine\DoctrineOrmWrapperCommand;
-use Oforge\Engine\Console\Commands\Example\ExampleBatchCommand;
-use Oforge\Engine\Console\Commands\Example\ExampleCommandOne;
-use Oforge\Engine\Console\Commands\Example\ExampleCommandThree;
-use Oforge\Engine\Console\Commands\Example\ExampleCommandTwo;
-use Oforge\Engine\Console\Commands\Example\ExampleGroupCommand;
-use Oforge\Engine\Console\Commands\Service\ServiceListCommand;
-use Oforge\Engine\Console\Commands\Service\ServiceRunCommand;
-use Oforge\Engine\Console\Services\ConsoleService;
+use Oforge\Engine\Console\Managers\ConsoleManager;
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
+use Oforge\Engine\Core\Manager\Events\Event;
 
 /**
  * Class Console-Bootstrap
@@ -29,26 +16,30 @@ class Bootstrap extends AbstractBootstrap {
     /**
      * Console-Bootstrap constructor.
      */
-    public function __construct() {
-        $this->commands = [
-            CleanupLogfilesCommand::class,
-            DevCleanupBatchCommand::class,
-            DevDoctrineOrmCacheCleanupCommand::class,
-            CommandListCommand::class,
-            DoctrineOrmWrapperCommand::class,
-            ExampleBatchCommand::class,
-            ExampleGroupCommand::class,
-            ExampleCommandOne::class,
-            ExampleCommandTwo::class,
-            ExampleCommandThree::class,
-            PingCommand::class,
-            ProcessAsyncEventsCommand::class,
-            ServiceListCommand::class,
-            ServiceRunCommand::class,
-        ];
-        $this->services = [
-            'console' => ConsoleService::class,
-        ];
+    protected function __construct() {
+        parent::__construct();
+        $this->setConfiguration('commands', [
+            Commands\Oforge\PingCommand::class,
+            Commands\Oforge\ProcessAsyncEventsCommand::class,
+            Commands\Oforge\ServiceCommand::class,
+            Commands\Cleanup\LogFilesCommand::class,
+            Commands\Cleanup\Cache\BootstrapCommand::class,
+            Commands\Cleanup\Cache\DoctrineProxyCommand::class,
+            Commands\Cleanup\Cache\NamespaceCallCommand::class,
+            Commands\Dev\Cleanup\Cache\DoctrineCommand::class,
+            Commands\Example\BatchCallCommand::class,
+            Commands\Example\Command1::class,
+            Commands\Example\Command2::class,
+            Commands\Example\Command3::class,
+            Commands\Example\NamespaceCallCommand::class,
+        ]);
+
+        // TODO after core refactoring: attach only if extension active
+        Oforge()->Events()->attach('Oforge:Extension:init', Event::SYNC, function (Event $event) {
+            /** @var AbstractBootstrap $boostrap */
+            $boostrap = $event->getDataValue('bootstrap');
+            ConsoleManager::registerCommandClasses($boostrap->getConfiguration('commands'));
+        });
     }
 
 }

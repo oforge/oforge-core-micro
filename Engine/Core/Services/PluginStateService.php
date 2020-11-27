@@ -21,6 +21,7 @@ use Oforge\Engine\Core\Exceptions\ServiceAlreadyExistException;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Exceptions\Template\TemplateNotFoundException;
 use Oforge\Engine\Core\Helper\Helper;
+use Oforge\Engine\Core\Manager\Events\Event;
 use Oforge\Engine\Core\Models\Plugin\Plugin;
 use Oforge\Engine\TemplateEngine\Core\Exceptions\InvalidScssVariableException;
 use Oforge\Engine\TemplateEngine\Core\Services\TemplateManagementService;
@@ -58,6 +59,7 @@ class PluginStateService extends AbstractDatabaseAccess {
         if (isset($plugin) && $plugin->getActive()) {
             $instance = Helper::getBootstrapInstance($pluginName);
             if (isset($instance)) {
+                Oforge()->Events()->trigger(Event::create('Oforge:Extension:init', ['bootstrap' => $instance]));
                 Oforge()->DB()->initModelSchema($instance->getModels());
                 $services = $instance->getServices();
                 Oforge()->Services()->register($services);

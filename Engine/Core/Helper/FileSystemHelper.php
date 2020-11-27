@@ -183,17 +183,6 @@ class FileSystemHelper {
     }
 
     /**
-     * Get all template files inside a defined path
-     *
-     * @param string $path
-     *
-     * @return string[]
-     */
-    public static function getThemeBootstrapFiles(string $path) {
-        return self::getCachedOrFind($path, 'template.php');
-    }
-
-    /**
      * Get all sub directories recursive based on the defined path, except the folders to oforge omit.
      *
      * @param string $path

@@ -33,5 +33,4 @@ class Statics {
     public const MODULES_DIR  = 'Modules';
     public const PLUGIN_DIR   = 'Plugins';
     // public const VIEW_DIR     = 'Views';
-    public const TEMPLATE_DIR = 'Themes';
 }

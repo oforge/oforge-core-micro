@@ -13,7 +13,8 @@ use Oforge\Engine\Crud\Service\GenericCrudService;
  */
 class Bootstrap extends AbstractBootstrap {
 
-    public function __construct() {
+    protected function __construct() {
+        parent::__construct();
         try {
             Oforge()->Logger()->initLogger('crud');
         } catch (LoggerAlreadyExistException $exception) {

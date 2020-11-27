@@ -16,7 +16,8 @@ use Oforge\Engine\Image\Enums\ImageConstants;
 class Bootstrap extends AbstractBootstrap {
 
     /** Bootstrap constructor. */
-    public function __construct() {
+    protected function __construct() {
+        parent::__construct();
         try {
             Oforge()->Logger()->initLogger(Enums\ImageConstants::LOGGER);
         } catch (LoggerAlreadyExistException $exception) {
