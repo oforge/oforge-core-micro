@@ -30,12 +30,13 @@ class Bootstrap extends AbstractBootstrap {
         ];
 
         $this->services = [
-            'auth.password'        => Services\PasswordService::class,
+            'auth.login'           => Services\LoginService::class,
             'auth.role'            => Services\RoleService::class,
             'auth.role.permission' => Services\RolePermissionService::class,
             'auth.user'            => Services\UserService::class,
             'auth.user.permission' => Services\UserPermissionService::class,
             'auth.user.role'       => Services\UserRoleService::class,
+            'auth.password'        => Services\PasswordService::class,
             'auth.permission'      => Services\PermissionService::class,
             // 'auth'          => AuthService::class,
         ];

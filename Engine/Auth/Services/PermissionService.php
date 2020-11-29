@@ -4,6 +4,7 @@ namespace Oforge\Engine\Auth\Services;
 
 use Doctrine\ORM\ORMException;
 use Oforge\Engine\Auth\Models\Permission;
+use Oforge\Engine\Auth\Models\Role;
 use Oforge\Engine\Auth\Models\RolePermission;
 use Oforge\Engine\Auth\Models\UserPermission;
 use Oforge\Engine\Auth\Models\UserRole;
@@ -20,6 +21,7 @@ class PermissionService extends AbstractDatabaseAccess {
     public function __construct() {
         parent::__construct([
             Permission::class     => Permission::class,
+            Role::class           => Role::class,
             UserRole::class       => UserRole::class,
             RolePermission::class => RolePermission::class,
             UserPermission::class => UserPermission::class,
@@ -66,18 +68,24 @@ class PermissionService extends AbstractDatabaseAccess {
      *
      * @return array<string,bool>
      */
-    public function getUserPermissions(int $userId) : array {
-        //TODO role order (for duplicates?)
+    public function getUserRolesAndPermissions(int $userId) : array {
+        //TODO role order (for duplicates/overriding?)
         /**
+         * @var Role[] $roleEntities
          * @var UserRole[] $userRoles
          * @var RolePermission[] $rolePermissions
          * @var UserPermission[] $userPermissions
          */
+        $roles       = [];
         $permissions = [];
         $userRoles   = $this->repository(UserRole::class)->findBy(['userId' => $userId], null);
         $userRoleIds = [];
         foreach ($userRoles as $userRole) {
             $userRoleIds[] = $userRole->getRoleId();
+        }
+        $roleEntities = $this->repository(Role::class)->findBy(['roleId' => $userRoleIds]);
+        foreach ($roleEntities as $roleEntity) {
+            $roles[$roleEntity->getId()] = $roleEntity->getName();
         }
         $rolePermissions = $this->repository(RolePermission::class)->findBy(['roleId' => $userRoleIds]);
         foreach ($rolePermissions as $rolePermission) {
@@ -85,12 +93,16 @@ class PermissionService extends AbstractDatabaseAccess {
         }
         $userPermissions = $this->repository(UserPermission::class)->findBy(['userId' => $userId]);
         foreach ($userPermissions as $userPermission) {
-            $key               = $userPermission->getPermission();
-            $enabled           = $userPermission->getEnabled() ?? $permissions[$key] ?? false;
-            $permissions[$key] = $enabled;
+            $permission = $userPermission->getPermission();
+            $enabled    = $userPermission->getEnabled() ?? $permissions[$permission] ?? false;
+
+            $permissions[$permission] = $enabled;
         }
 
-        return $permissions;
+        return [
+            'roles'       => $roles,
+            'permissions' => $permissions,
+        ];
     }
 
 }

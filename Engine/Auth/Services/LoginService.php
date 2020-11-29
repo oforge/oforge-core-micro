@@ -12,15 +12,13 @@ use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
  */
 class LoginService extends AbstractDatabaseAccess {
 
-    /**
-     * BaseLoginService constructor.
-     */
+    /** BaseLoginService constructor. */
     public function __construct() {
         parent::__construct(User::class);
     }
 
     /**
-     * Validate login credentials against entities in the database and if valid, respond with a JWT.
+     * Validate login credentials against entities in the database and if valid, store user data in session and view and respond it.
      *
      * @param string $login
      * @param string $password
@@ -29,18 +27,31 @@ class LoginService extends AbstractDatabaseAccess {
      * @noinspection PhpDocMissingThrowsInspection
      */
     public function login(string $login, string $password) : ?array {
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /**
+         * @var PasswordService $passwordService
+         * @noinspection PhpUnhandledExceptionInspection
+         */
         $passwordService = Oforge()->Services()->get('auth.password');
+        /**
+         * @var PermissionService $permissionService
+         * @noinspection PhpUnhandledExceptionInspection
+         */
+        $permissionService = Oforge()->Services()->get('auth.permission');
         /** @var User|null $user */
         $user = $this->repository()->findOneBy([
             'login'  => $login,
             'active' => true,
         ]);
         if ($user !== null && $passwordService->validate($password, $user->getPassword())) {
-            $userData = $user->toArray();
+            $this->logout();
+            $userData = $user->toArray(2, ['password']);
             unset($userData['password']);
+            $userData += $permissionService->getUserRolesAndPermissions($user->getId());
 
-            //TODO set direct to session & oforge->view->assign???
+            Oforge()->View()->assign(['user' => $userData]);
+            if (isset($_SESSION)) {
+                $_SESSION['user'] = $userData;
+            }
 
             return $userData;
         }
@@ -48,8 +59,14 @@ class LoginService extends AbstractDatabaseAccess {
         return null;
     }
 
+    /**
+     * Remove user data of session an view.
+     */
     public function logout() {
-        // TODO remove session & oforge->view->assign???
+        Oforge()->View()->delete('user');
+        if (isset($_SESSION)) {
+            unset($_SESSION['user']);
+        }
     }
 
 }
