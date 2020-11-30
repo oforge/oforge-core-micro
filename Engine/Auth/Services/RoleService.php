@@ -201,7 +201,7 @@ class RoleService extends AbstractDatabaseAccess {
         }
         $roleName = $role->getName();
         if (isset($data['active']) && in_array($roleName, [AuthConstants::ROLE_ANONYMOUS, AuthConstants::ROLE_USER])) {
-            throw new RoleImmutableException("Activation of role '$roleName' is not changeable!");
+            throw new RoleImmutableException("Role '$roleName' is not changeable!");
         }
         $role->fromArray($data);
         $this->entityManager()->update($role);
