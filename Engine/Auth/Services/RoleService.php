@@ -40,7 +40,6 @@ class RoleService extends AbstractDatabaseAccess {
 
     /**
      * @param string $name
-     * @param string|null $shortDescription
      * @param bool $active
      *
      * @return array

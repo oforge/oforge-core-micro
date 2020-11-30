@@ -33,8 +33,10 @@ class PasswordService {
      * @noinspection PhpDocMissingThrowsInspection
      */
     public function validateFormat(string $password) : PasswordService {
-        /** @var ConfigService $configService */
-        /** @noinspection PhpUnhandledExceptionInspection */
+        /**
+         * @var ConfigService $configService
+         * @noinspection PhpUnhandledExceptionInspection
+         */
         $configService = Oforge()->Services()->get('config');
 
         if (empty(trim($password))) {
@@ -45,6 +47,7 @@ class PasswordService {
             //     'de' => 'Das Passwort darf nicht leer sein oder nur aus Leerzeichen bestehen.',
             // ]));
         }
+        /** @noinspection PhpUnhandledExceptionInspection */
         $passwordMinLength = (int) $configService->get('auth_password_min_length');
         if (strlen($password) < $passwordMinLength) {
             throw new InvalidPasswordFormatException(sprintf(#

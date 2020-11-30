@@ -57,8 +57,6 @@ class Bootstrap extends AbstractBootstrap {
             'label'    => 'config_auth_password_min_length',
             'required' => true,
         ]);
-        /** @var UserService $userService */
-        $userService = Oforge()->Services()->get('auth.user');
         /** @var RoleService $roleService */
         $roleService = Oforge()->Services()->get('auth.role');
         $roleService->installDefaultRoles();
