@@ -43,7 +43,7 @@ class LoginService extends AbstractDatabaseAccess {
             'active' => true,
         ]);
         if ($user !== null && $passwordService->validate($password, $user->getPassword())) {
-            $this->logout();
+            $this->unsetLoginData();
             $userData = $user->toArray(2, ['password']);
             unset($userData['password']);
             $userData += $permissionService->getUserRolesAndPermissions($user->getId());
@@ -60,9 +60,27 @@ class LoginService extends AbstractDatabaseAccess {
     }
 
     /**
-     * Remove user data of session an view.
+     * Replace user data of session and view  with role and permissions of anonymous user.
      */
     public function logout() {
+        $this->unsetLoginData();
+        /**
+         * @var PermissionService $permissionService
+         * @noinspection PhpUnhandledExceptionInspection
+         */
+        $permissionService = Oforge()->Services()->get('auth.permission');
+        $userData          = $permissionService->getUserRolesAndPermissions(null);
+
+        Oforge()->View()->assign(['user' => $userData]);
+        if (isset($_SESSION)) {
+            $_SESSION['user'] = $userData;
+        }
+    }
+
+    /**
+     * Remove user data of session and view.
+     */
+    protected function unsetLoginData() {
         Oforge()->View()->delete('user');
         if (isset($_SESSION)) {
             unset($_SESSION['user']);

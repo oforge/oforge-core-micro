@@ -15,14 +15,13 @@ class UserPermissionHelper {
 
     /**
      * @param string $permission
-     * @param bool $default
      *
      * @return bool
      */
-    public static function has(string $permission, bool $default = false) : bool {
+    public static function has(string $permission) : bool {
         $userData = $_SESSION['user'] ?? Oforge()->View()->get('user', []);
 
-        return $userData['permissions'][$permission] ?? $default;
+        return $userData['permissions'][$permission] ?? false;
     }
 
 }

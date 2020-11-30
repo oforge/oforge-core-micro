@@ -7,7 +7,7 @@ use Doctrine\ORM\ORMException;
 use Exception;
 use Oforge\Engine\Auth\Exceptions\InvalidPasswordFormatException;
 use Oforge\Engine\Auth\Exceptions\PasswordGeneratorException;
-use Oforge\Engine\Auth\Exceptions\User\UserAlreadyExistException;
+use Oforge\Engine\Auth\Exceptions\User\UserLoginAlreadyExistException;
 use Oforge\Engine\Auth\Models\User;
 use Oforge\Engine\Core\Abstracts\AbstractDatabaseAccess;
 use Oforge\Engine\Core\Manager\Events\Event;
@@ -25,28 +25,6 @@ class UserService extends AbstractDatabaseAccess {
     }
 
     /**
-     * @param int $userId
-     * @param bool $active
-     *
-     * @throws EntityNotFoundException
-     * @throws ORMException
-     */
-    public function setActivationById(int $userId, bool $active) : void {
-        $this->setActivation($this->getById($userId), $active, 'id', $userId);
-    }
-
-    /**
-     * @param string $login User login.
-     * @param bool $active
-     *
-     * @throws EntityNotFoundException
-     * @throws ORMException
-     */
-    public function setActivationByLogin(string $login, bool $active) : void {
-        $this->setActivation($this->getByLogin($login), $active, 'login', $login);
-    }
-
-    /**
      * Create user.
      *
      * @param string $login
@@ -54,14 +32,16 @@ class UserService extends AbstractDatabaseAccess {
      * @param string|null $password
      *
      * @return array
-     * @throws UserAlreadyExistException
+     * @throws UserLoginAlreadyExistException
      * @throws PasswordGeneratorException
      * @throws InvalidPasswordFormatException
      * @throws ORMException
+     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpUnhandledExceptionInspection
      */
     public function create(string $login, string $email, ?string $password = null) : array {
         if ($this->existLogin($login)) {
-            throw new UserAlreadyExistException($login);
+            throw new UserLoginAlreadyExistException($login);
         }
         /** @var PasswordService $passwordService */
         $passwordService = Oforge()->Services()->get('auth.password');
@@ -157,20 +137,57 @@ class UserService extends AbstractDatabaseAccess {
     }
 
     /**
-     * @param User|null $user
+     * @param int $userId
      * @param bool $active
-     * @param string $key
-     * @param int|string $value
      *
      * @throws EntityNotFoundException
      * @throws ORMException
      */
-    protected function setActivation(?User $user, bool $active, string $key, $value) : void {
-        if ($user === null) {
-            throw EntityNotFoundException::fromClassNameAndIdentifier(User::class, [$key => $value]);
+    public function setActivationById(int $userId, bool $active) : void {
+        try {
+            $this->update($this->getById($userId), ['active' => $active], 'id', $userId);
+        } catch (UserLoginAlreadyExistException $exception) {
+            // could not happen
         }
-        $user->setActive($active);
-        $this->entityManager()->update($user);
+    }
+
+    /**
+     * @param string $login User login.
+     * @param bool $active
+     *
+     * @throws EntityNotFoundException
+     * @throws ORMException
+     */
+    public function setActivationByLogin(string $login, bool $active) : void {
+        try {
+            $this->update($this->getByLogin($login), ['active' => $active], 'login', $login);
+        } catch (UserLoginAlreadyExistException $exception) {
+            // could not happen
+        }
+    }
+
+    /**
+     * @param int $userId
+     * @param array $data
+     *
+     * @throws EntityNotFoundException
+     * @throws UserLoginAlreadyExistException
+     * @throws ORMException
+     */
+    public function updateById(int $userId, array $data) : void {
+        $this->update($this->getById($userId), $data, 'id', $userId);
+    }
+
+    /**
+     * @param string $login User login.
+     * @param array $data
+     *
+     * @throws EntityNotFoundException
+     * @throws UserLoginAlreadyExistException
+     * @throws ORMException
+     */
+    public function updateByLogin(string $login, array $data) : void {
+        $this->update($this->getByLogin($login), $data, 'login', $login);
     }
 
     /**
@@ -188,6 +205,28 @@ class UserService extends AbstractDatabaseAccess {
         $userData = $user->toArray();
         $this->entityManager()->remove($user);
         Oforge()->Events()->trigger(Event::create(User::class . '::removed', $userData));
+    }
+
+    /**
+     * @param User|null $user
+     * @param array $data
+     * @param string $key
+     * @param int|string $value
+     *
+     * @throws EntityNotFoundException
+     * @throws UserLoginAlreadyExistException
+     * @throws ORMException
+     */
+    protected function update(?User $user, array $data, string $key, $value) : void {
+        if ($user === null) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier(User::class, [$key => $value]);
+        }
+        if (isset($data['login']) && (($login = $data['login']) !== $user->getLogin()) && $this->existLogin($login, $user->getId())) {
+            throw new UserLoginAlreadyExistException($login);
+        }
+        $userData = $user->fromArray($data)->toArray();
+        $this->entityManager()->update($user);
+        Oforge()->Events()->trigger(Event::create(User::class . '::updated', $userData));
     }
 
 }

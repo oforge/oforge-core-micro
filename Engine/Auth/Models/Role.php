@@ -24,11 +24,6 @@ class Role extends AbstractModel {
      * @ORM\Column(name="active", type="boolean", options={"default":false})
      */
     private $active = false;
-    /**
-     * @var string $shortDescription
-     * @ORM\Column(name="short_description", type="string")
-     */
-    private $shortDescription;
 
     /**
      * @return string
@@ -62,24 +57,6 @@ class Role extends AbstractModel {
      */
     public function setActive(bool $active) : Role {
         $this->active = $active;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getShortDescription() : string {
-        return $this->shortDescription;
-    }
-
-    /**
-     * @param string $shortDescription
-     *
-     * @return Role
-     */
-    public function setShortDescription(string $shortDescription) : Role {
-        $this->shortDescription = $shortDescription;
 
         return $this;
     }

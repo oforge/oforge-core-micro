@@ -3,9 +3,9 @@
 namespace Oforge\Engine\Auth\Middlewares;
 
 use Oforge\Engine\Auth\Controller\SecureController;
-use Oforge\Engine\Auth\Models\User\User;
+use Oforge\Engine\Auth\Models\User;
 use Oforge\Engine\Auth\Services\AuthService;
-use Oforge\Engine\Auth\Services\PermissionService;
+use Oforge\Engine\Auth\Services\ControllerPermissionService;
 use Oforge\Engine\Core\Exceptions\ServiceNotFoundException;
 use Oforge\Engine\Core\Helper\ResponseHelper;
 use Slim\Http\Request;
@@ -64,7 +64,7 @@ class SecureMiddleware {
         $controllerClass  = $routeController['controllerClass'];
         $controllerMethod = $routeController['controllerMethod'];
         if (is_subclass_of($controllerClass, SecureController::class)) {
-            /** @var PermissionService $permissionService */
+            /** @var ControllerPermissionService $permissionService */
             $permissionService = Oforge()->Services()->get('permissions');
             $permission        = $permissionService->get($controllerClass, $controllerMethod);
         } else {

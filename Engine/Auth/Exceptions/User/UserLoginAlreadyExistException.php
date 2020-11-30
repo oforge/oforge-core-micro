@@ -5,14 +5,14 @@ namespace Oforge\Engine\Auth\Exceptions\User;
 use Oforge\Engine\Core\Exceptions\Basic\AlreadyExistException;
 
 /**
- * Class UserAlreadyExistException
+ * Class UserLoginAlreadyExistException
  *
  * @package Oforge\Engine\Auth\Exceptions\User
  */
-class UserAlreadyExistException extends AlreadyExistException {
+class UserLoginAlreadyExistException extends AlreadyExistException {
 
     /**
-     * UserAlreadyExistException constructor.
+     * UserLoginAlreadyExistException constructor.
      *
      * @param string $login
      */

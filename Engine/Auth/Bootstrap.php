@@ -2,6 +2,8 @@
 
 namespace Oforge\Engine\Auth;
 
+use Oforge\Engine\Auth\Services\RoleService;
+use Oforge\Engine\Auth\Services\UserService;
 use Oforge\Engine\Core\Abstracts\AbstractBootstrap;
 use Oforge\Engine\Core\Models\Config\ConfigType;
 use Oforge\Engine\Core\Services\ConfigService;
@@ -55,6 +57,13 @@ class Bootstrap extends AbstractBootstrap {
             'label'    => 'config_auth_password_min_length',
             'required' => true,
         ]);
+        /** @var UserService $userService */
+        $userService = Oforge()->Services()->get('auth.user');
+        /** @var RoleService $roleService */
+        $roleService = Oforge()->Services()->get('auth.role');
+        $roleService->installDefaultRoles();
+
+
     }
 
 }

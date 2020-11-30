@@ -3,6 +3,7 @@
 namespace Oforge\Engine\Auth\Services;
 
 use Doctrine\ORM\ORMException;
+use Oforge\Engine\Auth\AuthConstants;
 use Oforge\Engine\Auth\Models\Permission;
 use Oforge\Engine\Auth\Models\Role;
 use Oforge\Engine\Auth\Models\RolePermission;
@@ -64,11 +65,11 @@ class PermissionService extends AbstractDatabaseAccess {
     }
 
     /**
-     * @param int $userId
+     * @param int|null $userId
      *
-     * @return array<string,bool>
+     * @return array<string,array> [roles => names:string[], permissions:array<string,bool>]
      */
-    public function getUserRolesAndPermissions(int $userId) : array {
+    public function getUserRolesAndPermissions(?int $userId) : array {
         //TODO role order (for duplicates/overriding?)
         /**
          * @var Role[] $roleEntities
@@ -78,25 +79,38 @@ class PermissionService extends AbstractDatabaseAccess {
          */
         $roles       = [];
         $permissions = [];
-        $userRoles   = $this->repository(UserRole::class)->findBy(['userId' => $userId], null);
-        $userRoleIds = [];
-        foreach ($userRoles as $userRole) {
-            $userRoleIds[] = $userRole->getRoleId();
+        if ($userId === null) {
+            $roleEntity = $this->repository(Role::class)->findOneBy(['name' => AuthConstants::ROLE_ANONYMOUS]);
+            if ($roleEntity === null) {
+                $rolePermissions = [];
+            } else {
+                $roles[$roleEntity->getId()] = $roleEntity->getName();
+
+                $rolePermissions = $this->repository(RolePermission::class)->findBy(['roleId' => $roleEntity->getId()]);
+            }
+        } else {
+            $userRoleIds = [];
+            $userRoles   = $this->repository(UserRole::class)->findBy(['userId' => $userId], null);
+            foreach ($userRoles as $userRole) {
+                $userRoleIds[] = $userRole->getRoleId();
+            }
+            $roleEntities = $this->repository(Role::class)->findBy(['roleId' => $userRoleIds]);
+            foreach ($roleEntities as $roleEntity) {
+                $roles[$roleEntity->getId()] = $roleEntity->getName();
+            }
+            $rolePermissions = $this->repository(RolePermission::class)->findBy(['roleId' => $userRoleIds]);
         }
-        $roleEntities = $this->repository(Role::class)->findBy(['roleId' => $userRoleIds]);
-        foreach ($roleEntities as $roleEntity) {
-            $roles[$roleEntity->getId()] = $roleEntity->getName();
-        }
-        $rolePermissions = $this->repository(RolePermission::class)->findBy(['roleId' => $userRoleIds]);
         foreach ($rolePermissions as $rolePermission) {
             $permissions[$rolePermission->getPermission()] = $rolePermission->getEnabled();
         }
-        $userPermissions = $this->repository(UserPermission::class)->findBy(['userId' => $userId]);
-        foreach ($userPermissions as $userPermission) {
-            $permission = $userPermission->getPermission();
-            $enabled    = $userPermission->getEnabled() ?? $permissions[$permission] ?? false;
+        if ($userId !== null) {
+            $userPermissions = $this->repository(UserPermission::class)->findBy(['userId' => $userId]);
+            foreach ($userPermissions as $userPermission) {
+                $permission = $userPermission->getPermission();
+                $enabled    = $userPermission->getEnabled() ?? $permissions[$permission] ?? false;
 
-            $permissions[$permission] = $enabled;
+                $permissions[$permission] = $enabled;
+            }
         }
 
         return [

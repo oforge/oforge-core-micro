@@ -9,7 +9,7 @@ use Oforge\Engine\Auth\Controller\SecureController;
  *
  * @package Oforge\Engine\Auth\Services
  */
-class PermissionService {
+class ControllerPermissionService {
     /** @var array $methods */
     private $methods = [];
 
